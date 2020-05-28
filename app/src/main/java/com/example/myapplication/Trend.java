@@ -294,6 +294,8 @@ function getData2(){
 
         Linear yAxis1 = chart.yAxis(1);
         yAxis1.title(false);
+
+        
         yAxis1.orientation(Orientation.RIGHT);
         yAxis1.scale(ScaleTypes.LINEAR);
        // yAxis1.labels().format("{%value}%");
