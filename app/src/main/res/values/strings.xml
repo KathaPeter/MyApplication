@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Healthcare App</string>
+    <string name="login_title">HEALTHCARE</string>
+
+    <string name="login_button_text">LOGIN</string>
+    <string name="title_activity_welcome__page">Welcome_Page</string>
+
+
+</resources>

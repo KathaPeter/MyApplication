@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:context=".MainActivity" android:gravity="top" android:animateLayoutChanges="true"
+        android:layout_centerHorizontal="true" android:layout_gravity="top" android:orientation="vertical"
+        android:paddingLeft="20px" android:paddingRight="20px">
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="vertical">
+            <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"/>
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" android:gravity="center">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/login_title"
+                        android:id="@+id/lbTitle"
+                        android:textSize="36sp"
+                        app:layout_constraintTop_toTopOf="parent"/>
+            </LinearLayout>
+            <Space
+                    android:layout_height="80dp" android:layout_width="match_parent"/>
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp" android:id="@+id/input_user" android:hint="Benutzername"
+                        android:textSize="18sp" android:gravity="center" android:background="@drawable/background_input"
+                        android:drawableTop="@color/colorPrimaryDark"/>
+            </LinearLayout>
+            <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"/>
+            <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:inputType="textPassword"
+                    android:id="@+id/input_pwd" android:gravity="center" android:hint="Passwort"
+                    android:background="@drawable/background_input"
+            />
+            <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"/>
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:gravity="center">
+                <Button
+                        android:text="@string/login_button_text"
+                        android:layout_width="150dp"
+                        android:layout_height="80dp" android:id="@+id/btLogin" tools:layout_editor_absoluteY="520dp"
+                        tools:layout_editor_absoluteX="130dp" android:textSize="18sp" android:onClick="btLoginEvent"
+                        android:background="#76A197" android:textColor="#FFFFFF"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
