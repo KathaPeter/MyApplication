@@ -4,6 +4,8 @@
 
     <string name="login_button_text">LOGIN</string>
     <string name="title_activity_welcome__page">Welcome_Page</string>
+    <string name="passwort">Passwort</string>
+    <string name="email">eMail</string>
 
 
 </resources>

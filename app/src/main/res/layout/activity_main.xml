@@ -35,11 +35,18 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
+
                 <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp" android:id="@+id/input_user" android:hint="Benutzername"
-                        android:textSize="18sp" android:gravity="center" android:background="@drawable/background_input"
-                        android:drawableTop="@color/colorPrimaryDark"/>
+                    android:id="@+id/input_user"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/background_input"
+                    android:drawableTop="@color/colorPrimaryDark"
+                    android:gravity="center"
+                    android:hint="@string/email"
+                    android:inputType="textEmailAddress"
+                    android:textSize="18sp"
+                    android:autofillHints="" />
             </LinearLayout>
             <Space
                     android:layout_width="match_parent"
@@ -48,9 +55,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:inputType="textPassword"
-                    android:id="@+id/input_pwd" android:gravity="center" android:hint="Passwort"
+                    android:id="@+id/input_pwd" android:gravity="center" android:hint="@string/passwort"
                     android:background="@drawable/background_input"
-            />
+                android:importantForAutofill="no" />
             <Space
                     android:layout_width="match_parent"
                     android:layout_height="80dp"/>

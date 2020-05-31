@@ -15,7 +15,7 @@
 
 
         <activity
-                android:name=".Welcome_Page"
+                android:name=".WelcomeActivity"
                 android:label="@string/title_activity_welcome__page"
                 android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden">
