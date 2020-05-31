@@ -40,6 +40,7 @@ public class ContactPerson extends Fragment {
         root = inflater.inflate(R.layout.tab_3, container, false);
 
         Button buttonSave = (Button) root.findViewById(R.id.bt_save);
+        //  public Dialog_YesNo(FragmentActivity parent, String question, IEvent handlerYes, @Nullable IEvent handlerNo)
         buttonSave.setOnClickListener((v) ->
                 new Dialog_YesNo(getActivity(), G.qSaveContactPerson, ContactPerson.this::updateContactPerson, null)
         );

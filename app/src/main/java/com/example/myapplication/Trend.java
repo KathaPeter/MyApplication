@@ -295,13 +295,13 @@ function getData2(){
         Linear yAxis1 = chart.yAxis(1);
         yAxis1.title(false);
 
-        
+
         yAxis1.orientation(Orientation.RIGHT);
         yAxis1.scale(ScaleTypes.LINEAR);
        // yAxis1.labels().format("{%value}%");
 
 
-        chart.xAxis(0).title(" Datum ");
+        chart.xAxis(0).title("Datum");
         chart.xAxis(0).labels().width(50);
         chart.xAxis(0).labels().hAlign(HAlign.CENTER);
         chart.xAxis(0).staggerMode(true);
@@ -444,7 +444,6 @@ function getData2(){
     public void loadVitalValues(int numberOfDataPackages) {
 
         final JSONArray data = new JSONArray();
-
         final StatusCode mStatusCode = new StatusCode();
 
         // Request a string response from the provided URL.

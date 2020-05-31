@@ -7,9 +7,6 @@ public class G {
     public static String hostFireBase = "10.0.2.2";
     public static String portFireBase = "65500";
 
-
-
-
     public static String hostHealthCare = "schmiederm.selfhost.eu";
     public static String portHealthCare = "5000";
 

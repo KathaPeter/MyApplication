@@ -54,7 +54,6 @@ public class Input_VitalParameter extends Fragment {
 
     private void sendVitalParam() {
 
-
         /*
         {
             "benutzer": "marie",
@@ -71,19 +70,20 @@ public class Input_VitalParameter extends Fragment {
         JSONObject data = new JSONObject();
         try {
 
-            Helper.viewToJSON(root, data, R.id.gewicht, "gewicht");
-            Helper.viewToJSON(root, data, R.id.puls, "puls");
-            Helper.viewToJSON(root, data, R.id.blutdruck_systolisch, "blutdruckSys");
-            Helper.viewToJSON(root, data, R.id.blutdruck_diastolisch, "blutdruckDia");
-            Helper.viewToJSON(root, data, R.id.atemfrequenz, "atemfrequenz");
-
+            Helper.viewToJSONDecimal(root, data, R.id.gewicht, "gewicht");
+            Helper.viewToJSONDecimal(root, data, R.id.puls, "puls");
+            Helper.viewToJSONDecimal(root, data, R.id.blutdruck_systolisch, "blutdruckSys");
+            Helper.viewToJSONDecimal(root, data, R.id.blutdruck_diastolisch, "blutdruckDia");
+            Helper.viewToJSONDecimal(root, data, R.id.atemfrequenz, "atemfrequenz");
 
             data.put("timeStamp", "0001-01-01T00:00:00");
             data.put("benutzer", G.benutzer);
             data.put("praxis", G.praxis);
-
-
-
+            //data.put("gewicht", R.id.gewicht);
+            //data.put("puls", R.id.puls);
+            //data.put("blutdruckSys", R.id.blutdruck_systolisch);
+            //data.put("blutdruckDias", R.id.blutdruck_diastolisch);
+            //data.put("blutdruckDias", R.id.atemfrequenz);
 
             //TemporalStorage for HTTP StatusCode
             final StatusCode mStatusCode = new StatusCode();
