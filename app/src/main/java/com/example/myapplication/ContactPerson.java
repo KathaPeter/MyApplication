@@ -42,12 +42,12 @@ public class ContactPerson extends Fragment {
         Button buttonSave = (Button) root.findViewById(R.id.bt_save);
         //  public Dialog_YesNo(FragmentActivity parent, String question, IEvent handlerYes, @Nullable IEvent handlerNo)
         buttonSave.setOnClickListener((v) ->
-                new Dialog_YesNo(getActivity(), G.qSaveContactPerson, ContactPerson.this::updateContactPerson, null)
+                new Dialog_YesNo(getActivity(), Globals.qSaveContactPerson, ContactPerson.this::updateContactPerson, null)
         );
 
         Button buttonCancel = (Button) root.findViewById(R.id.bt_cancel);
         buttonCancel.setOnClickListener((v) ->
-                new Dialog_YesNo(getActivity(), G.qCancelContactPerson, ContactPerson.this::loadContactPerson, null)
+                new Dialog_YesNo(getActivity(), Globals.qCancelContactPerson, ContactPerson.this::loadContactPerson, null)
         );
 
 
@@ -90,7 +90,7 @@ public class ContactPerson extends Fragment {
 
 
             // Request a string response from the provided URL.
-            JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, "http://" + G.hostFireBase + ":" + G.portFireBase + "/UpdateDataContactPerson", data, //
+            JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, "http://" + Globals.hostFireBase + ":" + Globals.portFireBase + "/UpdateDataContactPerson", data, //
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
@@ -99,7 +99,7 @@ public class ContactPerson extends Fragment {
 
                                 String return_type = response.getString("return_type");
 
-                                if (return_type.compareTo(G.RETURN_OK) == 0) {
+                                if (return_type.compareTo(Globals.RETURN_OK) == 0) {
                                     Toast.makeText(getActivity(), "Update ContactPerson succeed", Toast.LENGTH_LONG).show();
                                 } else {
                                     Toast.makeText(getActivity(), "Error: "+ response.getString("message"), Toast.LENGTH_LONG).show();
@@ -134,7 +134,7 @@ public class ContactPerson extends Fragment {
     private void loadContactPerson() {
 
         // Request a string response from the provided URL.
-        JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, "http://" + G.hostFireBase + ":" + G.portFireBase + "/GetDataContactPerson", null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, "http://" + Globals.hostFireBase + ":" + Globals.portFireBase + "/GetDataContactPerson", null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // Display the first 500 characters of the response string.
@@ -142,7 +142,7 @@ public class ContactPerson extends Fragment {
 
                     String return_type = response.getString("return_type");
 
-                    if (return_type.compareTo(G.RETURN_OK) == 0) {
+                    if (return_type.compareTo(Globals.RETURN_OK) == 0) {
 
                         JSONObject data = response.getJSONObject("data");
 

@@ -22,4 +22,11 @@ public class PatientDto {
     public String plz;
 
 
+    public String getName() {
+        return name;
+    }
+
+    public String getVorname() {
+        return vorname;
+    }
 }

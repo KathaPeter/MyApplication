@@ -1,6 +1,6 @@
 package com.example.myapplication;
 
-public class G {
+public class Globals {
 
     public static final String RETURN_OK = "OK";
 
@@ -28,4 +28,7 @@ public class G {
 
     public static String benutzer = "marie";
     public static String praxis = "praxis";
+
+
+    public static String USE_UID_AS_USER = "VMm2buw12fWHoAlWq5vw8XKbHz53"; //FIXME make null
 }

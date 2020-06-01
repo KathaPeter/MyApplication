@@ -3,6 +3,13 @@ package com.example.myapplication;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.example.myapplication.data.PatientDto;
 import com.example.myapplication.service.FirestorePatientService;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -11,16 +18,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-
 import static com.example.myapplication.service.FirestorePatientService.getPatientData;
 
-public class WelcomeActivity extends AppCompatActivity  {
+public class WelcomeActivity extends AppCompatActivity {
 
     private final PagerAdapter pagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         @Override
@@ -32,15 +32,18 @@ public class WelcomeActivity extends AppCompatActivity  {
         public Fragment getItem(int i) {
             Fragment fragment;
 
-            switch(i){
+            switch (i) {
                 default:
-                case 0: fragment = new Input_VitalParameter();
+                case 0:
+                    fragment = new Input_VitalParameter();
                     break;
 
-                case 1: fragment = new Trend();
+                case 1:
+                    fragment = new Trend();
                     break;
 
-                case 2: fragment = new ContactPerson();
+                case 2:
+                    fragment = new ContactPerson();
                     break;
             }
             return fragment;
@@ -56,12 +59,12 @@ public class WelcomeActivity extends AppCompatActivity  {
         getPatientDataTask.addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    PatientDto patientDto = documentSnapshot.toObject(PatientDto.class);
-                    Log.d(FirestorePatientService.class.toString(), patientDto.getName()  + " was loaded");
-                    getIntent().putExtra("patient_name", patientDto.getName());
-                    getIntent().putExtra("patient_vorname", patientDto.getVorname());
-                    setWelcomeAlert();
-                }
+                PatientDto patientDto = documentSnapshot.toObject(PatientDto.class);
+                Log.d(FirestorePatientService.class.toString(), patientDto.getName() + " was loaded");
+                getIntent().putExtra("patient_name", patientDto.getName());
+                getIntent().putExtra("patient_vorname", patientDto.getVorname());
+                setWelcomeAlert();
+            }
 
         }).addOnFailureListener(new OnFailureListener() {
             @Override

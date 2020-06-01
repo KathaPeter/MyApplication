@@ -22,9 +22,6 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class Input_VitalParameter extends Fragment {
 
@@ -46,7 +43,7 @@ public class Input_VitalParameter extends Fragment {
 
         Button button = (Button) root.findViewById(R.id.bt_send);
         button.setOnClickListener((View v) -> {
-            new Dialog_YesNo(getActivity(), G.qSendVitalParam, Input_VitalParameter.this::sendVitalParam, null);
+            new Dialog_YesNo(getActivity(), Globals.qSendVitalParam, Input_VitalParameter.this::sendVitalParam, null);
         });
 
         return root;
@@ -77,8 +74,8 @@ public class Input_VitalParameter extends Fragment {
             Helper.viewToJSONDecimal(root, data, R.id.atemfrequenz, "atemfrequenz");
 
             data.put("timeStamp", "0001-01-01T00:00:00");
-            data.put("benutzer", G.benutzer);
-            data.put("praxis", G.praxis);
+            data.put("benutzer", Globals.benutzer);
+            data.put("praxis", Globals.praxis);
             //data.put("gewicht", R.id.gewicht);
             //data.put("puls", R.id.puls);
             //data.put("blutdruckSys", R.id.blutdruck_systolisch);
@@ -89,11 +86,16 @@ public class Input_VitalParameter extends Fragment {
             final StatusCode mStatusCode = new StatusCode();
 
             // Request a string response from the provided URL.
-            JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, "http://" + G.hostHealthCare + ":" + G.portHealthCare + "/api/GesundheitsDaten", data, //
+            JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten", data, //
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.i("DEBUG", "SendVitalParam Status: ["+mStatusCode.get()+"]");
+                            if(mStatusCode.get() == 200){
+                                Toast.makeText(getActivity(), "Send successfull", Toast.LENGTH_LONG).show();
+                            } else{
+                                Toast.makeText(getActivity(), "Send returned " + mStatusCode.get(), Toast.LENGTH_LONG).show();
+                            }
                         }
                     }, //
                     new Response.ErrorListener() {

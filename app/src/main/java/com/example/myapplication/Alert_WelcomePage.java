@@ -15,7 +15,7 @@ public class Alert_WelcomePage extends AppCompatDialogFragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             String patientName = getActivity().getIntent().getStringExtra("patient_name");
             String patientVorname = getActivity().getIntent().getStringExtra("patient_vorname");
-            String message = String.format("Herzlich Willkommen %s %s,\n\nwählen Dein gewünschtes Ziel.", patientVorname, patientName);
+            String message = String.format("Herzlich Willkommen %s %s,\n\nwähle Dein gewünschtes Ziel.", patientVorname, patientName);
             builder.setMessage(message)
                     .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                         @Override

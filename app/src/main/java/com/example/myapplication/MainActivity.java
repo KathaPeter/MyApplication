@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,30 +17,52 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
+
+
+
     private FirebaseAuth mAuth;
     public void btLoginEvent(View v) {
         EditText emailInput = (EditText) findViewById(R.id.input_user);
         EditText pwdInput = (EditText) findViewById(R.id.input_pwd);
 
-        mAuth.signInWithEmailAndPassword(emailInput.getText().toString(),
-                pwdInput.getText().toString())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(getApplicationContext(), "Login erfolgreich",
-                            Toast.LENGTH_LONG).show();
-                    Log.d(MainActivity.class.toString(), "signInWithEmailAndPassword:success");
-                    Intent intent = prepareIntentForWelcome(task.getResult().getUser());
-                    startActivity(intent);
-                } else {
-                    Log.w(MainActivity.class.toString(), "signInWithEmailAndPassword:failure", task.getException());
-                    Toast.makeText(getApplicationContext(), "Authentication failed.",
-                            Toast.LENGTH_LONG).show();
-                }
 
-            }
-        });
+        String userEMail = emailInput.getText().toString().trim();
+        String userPWD  = pwdInput.getText().toString().trim();
+
+
+        if ( Globals.USE_UID_AS_USER != null) {
+            Intent intent = prepareIntentForWelcome( Globals.USE_UID_AS_USER );
+            startActivity(intent);
+        }
+        else if (userEMail.length() == 0 || userPWD.length() == 0 ) {
+            Toast.makeText(getApplicationContext(), "EMail and Password required!",
+                    Toast.LENGTH_LONG).show();
+        } else {
+
+            Task<AuthResult> loginTask = mAuth.signInWithEmailAndPassword(userEMail,
+                    userPWD)
+                    .addOnCompleteListener(this, (@NonNull Task<AuthResult> task) -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), "Login erfolgreich",
+                                    Toast.LENGTH_LONG).show();
+                            Log.d(MainActivity.class.toString(), "signInWithEmailAndPassword:success");
+                            Intent intent = prepareIntentForWelcome(task.getResult().getUser().getUid());
+                            startActivity(intent);
+                        } else {
+                           authenticationFailed(task.getException());
+                        }
+
+                    }) //
+                    .addOnFailureListener((fExc) -> {
+                        authenticationFailed(fExc);
+                    });
+        }
+    }
+
+    private void authenticationFailed(Exception exc) {
+        Log.w(MainActivity.class.toString(), "signInWithEmailAndPassword:failure", exc);
+        Toast.makeText(getApplicationContext(), "Authentication failed.",
+                Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -58,11 +79,13 @@ public class MainActivity extends AppCompatActivity {
         mAuth.signOut();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
+        Log.d(MainActivity.class.toString(), "OnStart: CurrentUser is" + currentUser);
+
         if(currentUser != null){
             Log.d(MainActivity.class.toString(), "getCurrentUser:success");
             Toast.makeText(getApplicationContext(), "Willkommen zurück",
                     Toast.LENGTH_LONG).show();
-            Intent intent = prepareIntentForWelcome(currentUser);
+            Intent intent = prepareIntentForWelcome(currentUser.getUid());
             startActivity(intent);
         }else {
             Log.w(MainActivity.class.toString(), "signInWithEmailAndPassword:failure");
@@ -70,9 +93,9 @@ public class MainActivity extends AppCompatActivity {
        // updateUI(currentUser);
     }
 
-    private Intent prepareIntentForWelcome(  FirebaseUser currentUser){
+    private Intent prepareIntentForWelcome(  String userID){
         Intent intent = new Intent(this, WelcomeActivity.class);
-        intent.putExtra("user_uid", currentUser.getUid());
+        intent.putExtra("user_uid", userID);
         return intent;
     }
 }

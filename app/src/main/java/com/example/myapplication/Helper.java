@@ -35,12 +35,20 @@ public class Helper {
     public static void viewToJSONDecimal(View root, JSONObject data, int fieldId, String jsonAttrib) throws JSONException, ValidationException {
 
         EditText field = (EditText) root.findViewById(fieldId);
-        double number = Double.parseDouble(field.getText().toString());;
 
-        String checkInput = Double.toString(number);
-        if ( checkInput.length() == 0 ) {
+        String text = field.getText().toString().trim();
+
+        if ( text.length() == 0 ) {
             Log.i("DEBUG", "Empty field");
             throw new ValidationException("Empty field");
+        }
+
+        double number = 0.0;
+
+        try {
+            number = Double.parseDouble(text);
+        }catch(Exception e) {
+            throw new ValidationException(e.getMessage());
         }
 
         data.put(jsonAttrib, number);
