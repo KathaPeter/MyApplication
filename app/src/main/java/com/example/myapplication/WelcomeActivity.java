@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.myapplication.activities.ContactPersonFragment;
 import com.example.myapplication.data.PatientDto;
 import com.example.myapplication.service.FirestorePatientService;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -43,7 +44,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     break;
 
                 case 2:
-                    fragment = new ContactPerson();
+                    fragment = new ContactPersonFragment();
                     break;
             }
             return fragment;

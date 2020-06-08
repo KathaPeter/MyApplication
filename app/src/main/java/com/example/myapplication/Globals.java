@@ -30,5 +30,6 @@ public class Globals {
     public static String praxis = "praxis";
 
 
-    public static String USE_UID_AS_USER = "VMm2buw12fWHoAlWq5vw8XKbHz53"; //FIXME make null
+    public static String USE_UID_AS_USER = null;
+            //"VMm2buw12fWHoAlWq5vw8XKbHz53"; //FIXME make null
 }

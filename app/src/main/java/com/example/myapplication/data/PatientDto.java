@@ -1,6 +1,10 @@
 package com.example.myapplication.data;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.Data;
 
@@ -9,24 +13,16 @@ public class PatientDto {
 
     private String name;
 
-    public String vorname;
+    private String vorname;
 
-    public Timestamp geburtsdatum;
+    private Timestamp geburtsdatum;
 
-    public String straße;
+    private String straße;
 
-    public String hausnummer;
+    private String hausnummer;
 
-    public String ort;
+    private String ort;
 
-    public String plz;
+    private String plz;
 
-
-    public String getName() {
-        return name;
-    }
-
-    public String getVorname() {
-        return vorname;
-    }
 }
