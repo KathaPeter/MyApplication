@@ -74,14 +74,8 @@ public class Trend extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-
-
         AnyChartView anyChartView = root.findViewById(R.id.any_chart_view);
         anyChartView.setProgressBar(root.findViewById(R.id.progress_bar));
-
-
-
         loadVitalValues(9);
     }
 
@@ -89,10 +83,7 @@ public class Trend extends Fragment {
         return new ValueDataEntry(x, y);
     }
 
-
     public void loadVitalValues(int numberOfDataPackages) {
-
-
         /*
 
         [
@@ -121,13 +112,10 @@ public class Trend extends Fragment {
                     @Override
                     public void onResponse(JSONArray response) {
 
-
-
                         if (mStatusCode.get() == 200) {
 
                             int n = response.length();
                             List<DataEntry> list = new ArrayList<>();
-
 
                             try {
 
@@ -139,7 +127,6 @@ public class Trend extends Fragment {
                                     JSONObject o = null;
 
                                     o = (JSONObject) response.get(i);
-
 
                                     double sGewicht = Double.valueOf(o.getString("gewicht"));
                                     double sPuls = Double.valueOf(o.getString("puls"));
@@ -195,8 +182,6 @@ public class Trend extends Fragment {
 
     private void showData(List<DataEntry> list) {
 
-
-
       /*
            INIT AnyChart
          */
@@ -214,7 +199,7 @@ public class Trend extends Fragment {
 
         chart.tooltip().positionMode(TooltipPositionMode.POINT);
 
-        chart.title("Historical Trend Vital Values");
+        chart.title("Trend Vital Parameter");
 
         chart.xScale(ScaleTypes.LINEAR);
         chart.yScale(ScaleTypes.LINEAR);
@@ -310,7 +295,7 @@ public class Trend extends Fragment {
         Tooltip tooltip = chart.tooltip();
         tooltip.titleFormat( //
                 "function() {" +
-                        "    return \"YearXXX: \" + this.points[0].x;" +
+                        "    return \"Day: \" + this.points[0].x;" +
                         "  }");
 
         chart.legend().enabled(true);
@@ -325,9 +310,10 @@ public class Trend extends Fragment {
 
         Mapping series1Mapping = set.mapAs("{ x: 'x', value: 'value' }");
         Mapping series2Mapping = set.mapAs("{ x: 'x', value: 'value2' }");
+        Mapping series3Mapping = set.mapAs("{ x: 'x', value: 'value5' }");
+
 
         Line series1 = chart.line(series1Mapping);
-
         series1.name("Gewicht");
         series1.hovered().markers().enabled(true);
         series1.hovered().markers()
@@ -353,6 +339,20 @@ public class Trend extends Fragment {
                 .anchor(Anchor.LEFT_CENTER)
                 .offsetX(5d)
                 .offsetY(5d);
+
+
+        Line series3 = chart.line(series3Mapping);
+        series3.name("Atemfrequenz");
+        series3.hovered().markers().enabled(true);
+        series3.hovered().markers()
+                .type(MarkerType.CIRCLE)
+                .size(4d);
+        series3.tooltip()
+                .position("right")
+                .anchor(Anchor.LEFT_CENTER)
+                .offsetX(5d)
+                .offsetY(5d);
+        series3.yScale(ScaleTypes.LINEAR);
 
         //draw
         AnyChartView anyChartView = root.findViewById(R.id.any_chart_view);
