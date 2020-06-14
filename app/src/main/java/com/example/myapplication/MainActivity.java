@@ -17,39 +17,35 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
-
     private FirebaseAuth mAuth;
+
     public void btLoginEvent(View v) {
+
         EditText emailInput = (EditText) findViewById(R.id.input_user);
         EditText pwdInput = (EditText) findViewById(R.id.input_pwd);
-
-
         String userEMail = emailInput.getText().toString().trim();
-        String userPWD  = pwdInput.getText().toString().trim();
+        String userPWD = pwdInput.getText().toString().trim();
 
-
-        if ( Globals.USE_UID_AS_USER != null) {
-            Intent intent = prepareIntentForWelcome( Globals.USE_UID_AS_USER );
+        if (Globals.USE_UID_AS_USER != null) {
+            Intent intent = prepareIntentForWelcome(Globals.USE_UID_AS_USER);
+            intent.putExtra("user_email", "<dummyLogin>");
             startActivity(intent);
-        }
-        else if (userEMail.length() == 0 || userPWD.length() == 0 ) {
+        } else if (userEMail.length() == 0 || userPWD.length() == 0) {
             Toast.makeText(getApplicationContext(), "EMail and Password required!",
                     Toast.LENGTH_LONG).show();
         } else {
 
-            Task<AuthResult> loginTask = mAuth.signInWithEmailAndPassword(userEMail,
-                    userPWD)
+            Task<AuthResult> loginTask = mAuth.signInWithEmailAndPassword(userEMail, userPWD)   //
                     .addOnCompleteListener(this, (@NonNull Task<AuthResult> task) -> {
+
                         if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Login erfolgreich",
-                                    Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Login erfolgreich", Toast.LENGTH_LONG).show();
                             Log.d(MainActivity.class.toString(), "signInWithEmailAndPassword:success");
                             Intent intent = prepareIntentForWelcome(task.getResult().getUser().getUid());
+                            intent.putExtra("user_email", userEMail);
                             startActivity(intent);
                         } else {
-                           authenticationFailed(task.getException());
+                            authenticationFailed(task.getException());
                         }
 
                     }) //
@@ -61,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void authenticationFailed(Exception exc) {
         Log.w(MainActivity.class.toString(), "signInWithEmailAndPassword:failure", exc);
-        Toast.makeText(getApplicationContext(), "Authentication failed.",
+        Toast.makeText(getApplicationContext(), "No authentication possible. Please proove your login details.",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -81,19 +77,19 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(MainActivity.class.toString(), "OnStart: CurrentUser is" + currentUser);
 
-        if(currentUser != null){
+        if (currentUser != null) {
             Log.d(MainActivity.class.toString(), "getCurrentUser:success");
             Toast.makeText(getApplicationContext(), "Willkommen zurück",
                     Toast.LENGTH_LONG).show();
             Intent intent = prepareIntentForWelcome(currentUser.getUid());
             startActivity(intent);
-        }else {
+        } else {
             Log.w(MainActivity.class.toString(), "signInWithEmailAndPassword:failure");
         }
-       // updateUI(currentUser);
+        // updateUI(currentUser);
     }
 
-    private Intent prepareIntentForWelcome(  String userID){
+    private Intent prepareIntentForWelcome(String userID) {
         Intent intent = new Intent(this, WelcomeActivity.class);
         intent.putExtra("user_uid", userID);
         return intent;

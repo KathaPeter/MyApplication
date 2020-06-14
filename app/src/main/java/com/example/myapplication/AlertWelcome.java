@@ -8,7 +8,7 @@ import android.os.Message;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
-public class Alert_WelcomePage extends AppCompatDialogFragment {
+public class AlertWelcome extends AppCompatDialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the Builder class for convenient dialog construction

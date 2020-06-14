@@ -29,7 +29,7 @@
                     android:id="@+id/tab3_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Daten der Kontaktperson"
+                    android:text="Daten des Patienten"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -97,12 +97,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:paddingLeft="10dp"
-                android:paddingRight="5dp">
+                android:paddingRight="5dp"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="Tel.:"
+                    android:text="Geburtsdatum:"
                     android:textSize="18sp" />
 
                 <EditText
@@ -116,7 +117,7 @@
                     android:paddingLeft="10dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp"/>
+                    android:paddingBottom="5dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -203,6 +204,33 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="5dp">
+
+                <TextView
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="Ort:"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/input_town"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_input"
+                    android:ems="10"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingBottom="5dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingLeft="10dp"
@@ -218,14 +246,16 @@
                     android:id="@+id/input_email"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:layout_marginTop="5dp"
+                    android:layout_weight="1"
                     android:background="@drawable/background_input"
+                    android:editable="false"
                     android:ems="10"
                     android:paddingLeft="10dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     android:paddingBottom="5dp" />
+
             </LinearLayout>
 
             <LinearLayout

@@ -12,10 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -43,7 +45,7 @@ public class Input_VitalParameter extends Fragment {
 
         Button button = (Button) root.findViewById(R.id.bt_send);
         button.setOnClickListener((View v) -> {
-            new Dialog_YesNo(getActivity(), Globals.qSendVitalParam, Input_VitalParameter.this::sendVitalParam, null);
+            new DialogYesNo(getActivity(), Globals.qSendVitalParam, Input_VitalParameter.this::sendVitalParam, null);
         });
 
         return root;
@@ -75,12 +77,8 @@ public class Input_VitalParameter extends Fragment {
 
             data.put("timeStamp", "0001-01-01T00:00:00");
             data.put("benutzer", Globals.benutzer);
-            data.put("praxis", Globals.praxis);
-            //data.put("gewicht", R.id.gewicht);
-            //data.put("puls", R.id.puls);
-            //data.put("blutdruckSys", R.id.blutdruck_systolisch);
-            //data.put("blutdruckDias", R.id.blutdruck_diastolisch);
-            //data.put("blutdruckDias", R.id.atemfrequenz);
+            data.put("praxis", "praxis"); //TODO
+
 
             //TemporalStorage for HTTP StatusCode
             final StatusCode mStatusCode = new StatusCode();
@@ -90,10 +88,10 @@ public class Input_VitalParameter extends Fragment {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.i("DEBUG", "SendVitalParam Status: ["+mStatusCode.get()+"]");
-                            if(mStatusCode.get() == 200){
+                            Log.e(Input_VitalParameter.class.getSimpleName() + ".class", "SendVitalParam Status: [" + mStatusCode.get() + "]");
+                            if (mStatusCode.get() == 200) {
                                 Toast.makeText(getActivity(), "Send successfull", Toast.LENGTH_LONG).show();
-                            } else{
+                            } else {
                                 Toast.makeText(getActivity(), "Send returned " + mStatusCode.get(), Toast.LENGTH_LONG).show();
                             }
                         }
@@ -102,15 +100,22 @@ public class Input_VitalParameter extends Fragment {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             String text = error.getMessage();
-                            Log.i("DEBUG", text == null ? "<null>" : text );
-                            Toast.makeText(getActivity(), "Server unreachable", Toast.LENGTH_LONG).show();
+                            Log.e(Input_VitalParameter.class.getSimpleName() + ".class", text == null ? "<null>" : text);
+                            Toast.makeText(getActivity(), "Send returned with error", Toast.LENGTH_LONG).show();
                         }
                     }) {
 
                 @Override
                 protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                     if (response != null) {
-                         mStatusCode.set(response.statusCode);
+                        mStatusCode.set(response.statusCode);
+                    }
+                    if (response.data.length == 0) { //HACK data.length == empty
+                        try {
+                            return Response.success(new JSONObject(), HttpHeaderParser.parseCacheHeaders(response));
+                        } catch (Exception exc) {
+                            return Response.error(new ParseError(exc));
+                        }
                     }
                     return super.parseNetworkResponse(response);
                 }

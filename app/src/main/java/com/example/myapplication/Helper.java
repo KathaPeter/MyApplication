@@ -1,11 +1,13 @@
 package com.example.myapplication;
 
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.internal.ContextUtils;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,4 +56,20 @@ public class Helper {
         data.put(jsonAttrib, number);
     }
 
+    public static void documentToView(View root, DocumentSnapshot data, int fieldId, String attributeName) {
+        EditText field = (EditText) root.findViewById(fieldId);
+        field.setText(data.getString(attributeName));
+    }
+
+    public static String validate(View root, int fieldId) throws ValidationException {
+
+        EditText field = root.findViewById(fieldId);
+        String text = field.getText().toString().trim();
+
+        if ( text.length() == 0 ) {
+            throw new ValidationException(("Empty Field "));
+        }
+
+        return text;
+    }
 }

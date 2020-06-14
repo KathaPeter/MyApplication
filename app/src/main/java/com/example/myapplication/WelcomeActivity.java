@@ -11,6 +11,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.myapplication.activities.ContactPersonFragment;
+import com.example.myapplication.activities.PatientPersonFragment;
 import com.example.myapplication.data.PatientDto;
 import com.example.myapplication.service.FirestorePatientService;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,7 +27,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private final PagerAdapter pagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -46,6 +47,10 @@ public class WelcomeActivity extends AppCompatActivity {
                 case 2:
                     fragment = new ContactPersonFragment();
                     break;
+
+                case 3:
+                    fragment = new PatientPersonFragment();
+                    break;
             }
             return fragment;
         }
@@ -61,9 +66,9 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 PatientDto patientDto = documentSnapshot.toObject(PatientDto.class);
-                Log.d(FirestorePatientService.class.toString(), patientDto.getName() + " was loaded");
-                getIntent().putExtra("patient_name", patientDto.getName());
-                getIntent().putExtra("patient_vorname", patientDto.getVorname());
+                Log.d(FirestorePatientService.class.toString(), patientDto.name + " was loaded");
+                getIntent().putExtra("patient_name", patientDto.name);
+                getIntent().putExtra("patient_vorname", patientDto.vorname);
                 setWelcomeAlert();
             }
 
@@ -80,13 +85,17 @@ public class WelcomeActivity extends AppCompatActivity {
         viewPager.setAdapter(pagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        for (int i = 0; i < tabs.getTabCount(); i++) {
-            tabs.getTabAt(i).setIcon(R.mipmap.ic_launcher);  //TODO set Icon
-        }
+
+
+
+        tabs.getTabAt(0).setIcon(R.mipmap.ic_launcher);
+        tabs.getTabAt(1).setIcon(R.mipmap.ic_launcher);
+        //tabs.getTabAt(2).setIcon(R.mipmap.ic_contactperson);
+        tabs.getTabAt(3).setIcon(R.mipmap.ic_launcher);
     }
 
     void setWelcomeAlert() {
-        Alert_WelcomePage alert = new Alert_WelcomePage();
+        AlertWelcome alert = new AlertWelcome();
         alert.show(getSupportFragmentManager(), "Welcome_Alert");
     }
 

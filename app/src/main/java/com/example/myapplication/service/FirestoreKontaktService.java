@@ -11,7 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class FirestoreKontaktService {
 
-    public static Task<DocumentSnapshot> getKontaktDocumentReference(String uid) {
+    public static Task<DocumentSnapshot> getContactData(String uid) {
         return FirebaseFirestore.getInstance().collection("kontakt").document(uid).get();
     }
 
@@ -26,7 +26,6 @@ public class FirestoreKontaktService {
                     FirebaseFirestore.getInstance().collection("kontakt").document(uid).set(dto.toMap());
                 }
             }
-
         });
     }
 }

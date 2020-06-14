@@ -11,18 +11,31 @@ import lombok.Data;
 @Data
 public class PatientDto {
 
-    private String name;
+    public String name;
 
-    private String vorname;
+    public String vorname;
 
-    private Timestamp geburtsdatum;
+    public Timestamp geburtsdatum;
 
-    private String straße;
+    public String straße;
 
-    private String hausnummer;
+    public String hausnummer;
 
-    private String ort;
+    public String ort;
 
-    private String plz;
+    public String plz;
 
+
+    @Exclude
+    public Map<String,Object> toMap(){
+        Map<String, Object> result = new HashMap<>();
+        result.put("name", name);
+        result.put("vorname", vorname);
+        result.put("straße", straße);
+        result.put("hausnummer", hausnummer);
+        result.put("plz", plz);
+        result.put("ort", ort);
+        //result.put("geburtsdatum", geburtsdatum);
+        return result;
+    }
 }
