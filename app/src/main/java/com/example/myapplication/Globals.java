@@ -37,9 +37,9 @@ public class Globals {
     public static String patientUID = null;
 
 
-    public static String USE_UID_AS_USER = "TTW8PLIAjWZUrl92ap5DHyv3gx42"; //FIXME make null
-    public static boolean filterTrendsPerDay = false; //FIXME make true
-    public static boolean useDummyVitalValues = true; //FIXME make false
+    public static String USE_UID_AS_USER = null;//= "TTW8PLIAjWZUrl92ap5DHyv3gx42"; //FIXME make null
+    public static boolean filterTrendsPerDay = true; //FIXME make true
+    public static boolean useDummyVitalValues = false; //FIXME make false
 
 
 

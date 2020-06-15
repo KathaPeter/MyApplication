@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(MainActivity.class.toString(), "signInWithEmailAndPassword:success");
                             Intent intent = prepareIntentForWelcome(task.getResult().getUser().getUid());
                             intent.putExtra("user_email", userEMail);
+                            FirebaseMessaging.getInstance().subscribeToTopic("user_"+intent.getStringExtra("user_uid"));
                             startActivity(intent);
                         } else {
                             authenticationFailed(task.getException());

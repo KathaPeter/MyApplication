@@ -20,6 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.myapplication.service.FirestoreFormularService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,6 +92,7 @@ public class Input_VitalParameter extends Fragment {
                             Log.e(Input_VitalParameter.class.getSimpleName() + ".class", "SendVitalParam Status: [" + mStatusCode.get() + "]");
                             if (mStatusCode.get() == 200) {
                                 Toast.makeText(getActivity(), "Send successfull", Toast.LENGTH_LONG).show();
+                                FirestoreFormularService.updateFormularDate(getActivity().getIntent().getStringExtra("user_uid"));
                             } else {
                                 Toast.makeText(getActivity(), "Send returned " + mStatusCode.get(), Toast.LENGTH_LONG).show();
                             }
