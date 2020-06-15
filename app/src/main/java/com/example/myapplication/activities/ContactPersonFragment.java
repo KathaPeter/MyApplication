@@ -91,7 +91,7 @@ public class ContactPersonFragment extends Fragment {
         Task<DocumentSnapshot> getContactTask = FirestoreKontaktService.getContactData(getActivity().getIntent().getStringExtra("user_uid"));
         getContactTask.addOnSuccessListener(result -> {
             KontaktDto kontaktDto = result.toObject(KontaktDto.class);
-            Toast.makeText(this.getContext(), "Kontaktdaten wurden geladen", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this.getContext(), "Kontaktdaten wurden geladen", Toast.LENGTH_LONG).show();
             if(kontaktDto!= null) {
                 reloadForm(kontaktDto);
             }});

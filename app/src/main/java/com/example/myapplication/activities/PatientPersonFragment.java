@@ -88,7 +88,7 @@ public class PatientPersonFragment extends androidx.fragment.app.Fragment {
         Task<DocumentSnapshot> getDataTask = FirestorePatientService.getPatientData(getActivity().getIntent().getStringExtra("user_uid"));
         getDataTask.addOnSuccessListener(result -> {
             PatientDto patientDto = result.toObject(PatientDto.class);
-            Toast.makeText(this.getContext(), "Patientendaten wurden geladen", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this.getContext(), "Patientendaten wurden geladen", Toast.LENGTH_LONG).show();
             if(patientDto!= null) {
                 reloadForm(patientDto);
             }});

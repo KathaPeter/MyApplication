@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         if (Globals.USE_UID_AS_USER != null) {
             Intent intent = prepareIntentForWelcome(Globals.USE_UID_AS_USER);
             intent.putExtra("user_email", "<dummyLogin>");
-            startActivity(intent);
+            startActivityForResult(intent, 1);
         } else if (userEMail.length() == 0 || userPWD.length() == 0) {
             Toast.makeText(getApplicationContext(), "EMail and Password required!",
                     Toast.LENGTH_LONG).show();
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(MainActivity.class.toString(), "signInWithEmailAndPassword:success");
                             Intent intent = prepareIntentForWelcome(task.getResult().getUser().getUid());
                             intent.putExtra("user_email", userEMail);
-                            startActivity(intent);
+                            startActivityForResult(intent, 2);
                         } else {
                             authenticationFailed(task.getException());
                         }
@@ -62,6 +62,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 2) {
+            mAuth.signOut();
+        } else if (requestCode == 1) {
+            //NO logout needed
+        } else {
+            //??
+        }
+
+        Log.d("MainActivity.class", "onActivityResult: " + requestCode + " " + resultCode + " "+ data);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
@@ -71,22 +86,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // TODO ADE: Remove signOut when we got a logout button
-        mAuth.signOut();
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         Log.d(MainActivity.class.toString(), "OnStart: CurrentUser is" + currentUser);
 
         if (currentUser != null) {
-            Log.d(MainActivity.class.toString(), "getCurrentUser:success");
+            Log.d(MainActivity.class.toString(), "onStart getCurrentUser:success");
             Toast.makeText(getApplicationContext(), "Willkommen zurück",
                     Toast.LENGTH_LONG).show();
             Intent intent = prepareIntentForWelcome(currentUser.getUid());
-            startActivity(intent);
+            intent.putExtra("user_email", currentUser.getEmail());
+            startActivityForResult(intent, 2);
         } else {
-            Log.w(MainActivity.class.toString(), "signInWithEmailAndPassword:failure");
+            Log.d(MainActivity.class.toString(), "onStart signInWithEmailAndPassword:failure");
         }
-        // updateUI(currentUser);
+
     }
 
     private Intent prepareIntentForWelcome(String userID) {

@@ -11,8 +11,25 @@
     <com.anychart.AnyChartView
         android:id="@+id/any_chart_view1"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
 
+    </com.anychart.AnyChartView>
+
+    <Spinner
+        android:id="@+id/ddSeries"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_weight="0.05" />
+
+    <SeekBar
+        android:id="@+id/barDays"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_weight="0.05"
+        android:max="18"
+        android:progress="3" />
 
 
 </LinearLayout>

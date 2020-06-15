@@ -1,7 +1,10 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -86,11 +89,15 @@ public class WelcomeActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-
+        Button btLogout = findViewById(R.id.btLogout);
+        btLogout.setOnClickListener((View v)->{
+            setResult(0, new Intent());
+            finish();
+        });
 
         tabs.getTabAt(0).setIcon(R.mipmap.ic_launcher);
         tabs.getTabAt(1).setIcon(R.mipmap.ic_launcher);
-        //tabs.getTabAt(2).setIcon(R.mipmap.ic_contactperson);
+        tabs.getTabAt(2).setIcon(R.mipmap.ic_launcher);
         tabs.getTabAt(3).setIcon(R.mipmap.ic_launcher);
     }
 
