@@ -162,7 +162,7 @@ public class Trend extends Fragment {
 
         for ( SpinnerItem item : spinnerItems) {
             Line series = chart.line(set.mapAs(item.getMapping()));
-            //series.name(item.toString());
+            series.name(item.toString());
 
             series.hovered().markers().enabled(true);
             series.hovered().markers()

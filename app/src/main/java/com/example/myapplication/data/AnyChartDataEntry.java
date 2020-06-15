@@ -51,7 +51,7 @@ public class AnyChartDataEntry extends ValueDataEntry {
                             calendar.get(Calendar.DAY_OF_MONTH);
 
             if (!Globals.filterTrendsPerDay) {
-                xValue += "_" + index;
+                xValue += "_" + (char) ('a'+index);
             }
             return new AnyChartDataEntry(xValue, dGewicht, dPuls, dBlutSys, dBlutDias, dAtemFreq, calendar);
         } catch (Exception exc) {
