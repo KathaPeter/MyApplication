@@ -300,7 +300,7 @@ public class Trend extends Fragment {
                 i.getLine().enabled(false);
                 i.getLegendItem().disabled();
                 i.getLegendItem().iconEnabled(false);
-                i.getLegendItem().text("");
+                i.getLegendItem().text(".");
             }
 
             item.getLine().enabled(true);
