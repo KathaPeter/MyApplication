@@ -33,11 +33,9 @@ public class Globals {
             + "Drücken Sie auf Ja, um diese zu behalten.\n"    //
             + "Drücken Sie auf Nein, um Ihre Eingaben nochmals einzusehen.";
 
-    public static String benutzer = "marie";
-    public static String patientUID = null;
+    
 
-
-    public static String USE_UID_AS_USER = null; //"TTW8PLIAjWZUrl92ap5DHyv3gx42"; //FIXME make null
+    public static String USE_UID_AS_USER = "TTW8PLIAjWZUrl92ap5DHyv3gx42"; //FIXME make null
     public static boolean filterTrendsPerDay = true; //FIXME make true
     public static boolean useDummyVitalValues = false; //FIXME make false
 

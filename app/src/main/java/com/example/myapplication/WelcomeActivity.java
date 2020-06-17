@@ -95,10 +95,10 @@ public class WelcomeActivity extends AppCompatActivity {
             finish();
         });
 
-        tabs.getTabAt(0).setIcon(R.mipmap.ic_launcher);
-        tabs.getTabAt(1).setIcon(R.mipmap.ic_launcher);
-        tabs.getTabAt(2).setIcon(R.mipmap.ic_launcher);
-        tabs.getTabAt(3).setIcon(R.mipmap.ic_launcher);
+        tabs.getTabAt(0).setIcon(R.mipmap.ic_vital_parameter);
+        tabs.getTabAt(1).setIcon(R.mipmap.ic_trend);
+        tabs.getTabAt(2).setIcon(R.mipmap.ic_kontakt);
+        tabs.getTabAt(3).setIcon(R.mipmap.ic_user);
     }
 
     void setWelcomeAlert() {

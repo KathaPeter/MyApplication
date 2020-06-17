@@ -21,6 +21,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.myapplication.service.FirestoreFormularService;
+import com.example.myapplication.service.StatusCode;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,7 +78,7 @@ public class Input_VitalParameter extends Fragment {
             Helper.viewToJSONDecimal(root, data, R.id.atemfrequenz, "atemfrequenz");
 
             data.put("timeStamp", "0001-01-01T00:00:00");
-            data.put("benutzer", Globals.benutzer);
+            data.put("benutzer", getActivity().getIntent().getExtras().getString("patient_vorname"));
             data.put("praxis", "praxis"); //TODO
 
 

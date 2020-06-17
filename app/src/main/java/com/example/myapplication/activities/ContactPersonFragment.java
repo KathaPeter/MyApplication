@@ -77,7 +77,7 @@ public class ContactPersonFragment extends Fragment {
 
 
         kontaktDto.setEmail(Helper.validate(root, R.id.input_email));
-        kontaktDto.setStraße(Helper.validate(root, R.id.input_town));
+        //kontaktDto.setStraße(Helper.validate(root, R.id.input_town));
         kontaktDto.setHausnummer(Helper.validate(root, R.id.input_housenumber));
         kontaktDto.setPlz(Helper.validate(root, R.id.input_plz));
         kontaktDto.setTelefonNummer(Helper.validate(root, R.id.input_birthdate));

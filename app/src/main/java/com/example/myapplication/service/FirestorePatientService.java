@@ -12,7 +12,7 @@ public class FirestorePatientService {
 
     public static Task<DocumentSnapshot> getPatientData(String uid){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        return    db.collection("patient").document(uid).get();
+        return  db.collection("patient").document(uid).get();
     }
 
     public static void updateData(String uid, PatientDto patientDto) {

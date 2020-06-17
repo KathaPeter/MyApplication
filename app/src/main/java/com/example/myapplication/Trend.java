@@ -14,37 +14,32 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.anychart.APIlib;
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.charts.Cartesian;
 import com.anychart.core.axes.Linear;
+import com.anychart.core.axismarkers.Range;
 import com.anychart.core.cartesian.series.Line;
 import com.anychart.core.ui.Crosshair;
 import com.anychart.core.ui.Legend;
 import com.anychart.core.ui.Tooltip;
 import com.anychart.core.utils.LegendItemSettings;
-import com.anychart.data.Mapping;
 import com.anychart.data.Set;
 import com.anychart.enums.Anchor;
 import com.anychart.enums.MarkerType;
 import com.anychart.enums.Orientation;
-import com.anychart.enums.ScaleTypes;
 import com.anychart.enums.TooltipPositionMode;
 import com.anychart.graphics.vector.Stroke;
 import com.anychart.graphics.vector.text.HAlign;
 import com.example.myapplication.data.AnyChartDataEntry;
+import com.example.myapplication.service.HealthCareServerTrendService;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -73,12 +68,13 @@ public class Trend extends Fragment {
 
         //dGewicht, dPuls, dBlutSys, dBlutDias, dAtemFreq
         spinnerItems = new ArrayList<>();
-        spinnerItems.add(new SpinnerItem("Gewicht", "{ x: 'x', value: 'value' }"));
-        spinnerItems.add(new SpinnerItem("Puls", "{ x: 'x', value: 'value2' }"));
-        spinnerItems.add(new SpinnerItem("Blutdruck (sys)", "{ x: 'x', value: 'value3' }"));
-        spinnerItems.add(new SpinnerItem("Blutdruck (dias)", "{ x: 'x', value: 'value4' }"));
-        spinnerItems.add(new SpinnerItem("Atemfrequenz", "{ x: 'x', value: 'value5' }"));
+        spinnerItems.add(new SpinnerItem("Gewicht", "{ x: 'x', value: 'value' }", "gewicht"));
+        spinnerItems.add(new SpinnerItem("Puls", "{ x: 'x', value: 'value2' }", "puls"));
+        spinnerItems.add(new SpinnerItem("Blutdruck (sys)", "{ x: 'x', value: 'value3' }", "blutdruckSys"));
+        spinnerItems.add(new SpinnerItem("Blutdruck (dias)", "{ x: 'x', value: 'value4' }", "blutdruckDia"));
+        spinnerItems.add(new SpinnerItem("Atemfrequenz", "{ x: 'x', value: 'value5' }", "atemfrequenz"));
 
+        loadLimitValues();
         initAnyChart();
 
         Spinner spinner = root.findViewById(R.id.ddSeries);
@@ -121,6 +117,115 @@ public class Trend extends Fragment {
         return root;
     }
 
+    private void loadLimitValues() {
+
+
+        final String benutzer = Objects.requireNonNull(Objects.requireNonNull(getActivity()).getIntent().getExtras()).getString("patient_vorname");
+        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/Alarm/" + benutzer;
+
+        HealthCareServerTrendService.request(//
+                requestQueue, //
+                url,  //
+                (JSONArray response) -> {
+
+                    final int n = response.length();
+
+                    List<DataEntry> list = new ArrayList<>(n);
+
+                    for (int i = 0; i < n; i++) {
+
+                        String check = null;
+                        double min = -1;
+                        double max = -1;
+                        try {
+                            JSONObject jsonObject = _safeGet(response, i);
+                            check = jsonObject.getString("check");
+                            min = jsonObject.getDouble("min");
+                            max = jsonObject.getDouble("max");
+                        } catch (JSONException exc) {
+
+                        }
+
+                        SpinnerItem itemFound = null;
+                        for (SpinnerItem item : spinnerItems) {
+                            if (item.getJsonAttributeName().compareTo(check) == 0) {
+                                itemFound = item;
+                                break;
+                            }
+                        }
+
+                        if (itemFound == null) {
+                            Log.e("Trend.class", "LoadLimit: unknown JSONObject check <" + check + ">");
+                        } else {
+                            itemFound.setRange(min, max);
+                        }
+                    }
+                },  //
+                (Integer status) -> Toast.makeText(getActivity(), "Load Vital-Values Status " + status, Toast.LENGTH_LONG).show(), //
+                (VolleyError error) -> {
+                    String text = error.getMessage();
+                    Log.e("DEBUG", text == null ? "" : text);
+                    Toast.makeText(getActivity(), "Server unreachable: Could not load Vital-Values", Toast.LENGTH_LONG).show();
+                });
+
+    }
+
+    public void loadVitalValues(int numberOfDays) {
+        /*
+
+        [
+            {
+                "benutzer": "marie",
+                "praxis": "praxis",
+                "gewicht": 55.0,
+                "puls": 80.0,
+                "blutdruckSys": 180.0,
+                "blutdruckDia": 93.0,
+                "atemfrequenz": 85.0,
+                "timeStamp": "2020-05-20T11:03:56.4614718Z"  //format?
+            },
+            //....
+        ]
+
+         */
+
+        final String benutzer = Objects.requireNonNull(Objects.requireNonNull(getActivity()).getIntent().getExtras()).getString("patient_vorname");
+        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten/" + benutzer + "/" + numberOfDays;
+
+        HealthCareServerTrendService.request(//
+                requestQueue, //
+                url,  //
+                (JSONArray response) -> {
+
+                    final int n = response.length();
+
+                    List<DataEntry> list = new ArrayList<>(n);
+
+                    for (int i = 0; i < n; i++) {
+                        AnyChartDataEntry entry = AnyChartDataEntry.createFrom(_safeGet(response, i), i);
+                        if (entry != null) {
+                            Log.e(Trend.class.getSimpleName() + ".class", "entry " + i + " is " + entry.date.getTime());
+                            list.add(entry);
+                        } else {
+                            Log.e(Trend.class.getSimpleName() + ".class", "entry " + i + " is null");
+                        }
+                    }
+
+                    Trend.this.list = list;
+                    //Toast.makeText(getActivity(), "server: " + n + " chart: " + list.size(), Toast.LENGTH_LONG).show();
+
+                    Spinner spinner = root.findViewById(R.id.ddSeries);
+                    showData((SpinnerItem) spinner.getSelectedItem());
+
+                },  //
+                (Integer status) -> Toast.makeText(getActivity(), "Load Vital-Values Status " + status, Toast.LENGTH_LONG).show(), //
+                (VolleyError error) -> {
+                    String text = error.getMessage();
+                    Log.e("DEBUG", text == null ? "" : text);
+                    Toast.makeText(getActivity(), "Server unreachable: Could not load Vital-Values", Toast.LENGTH_LONG).show();
+                });
+    }
+
     private void initAnyChart() {
 
         Cartesian chart = AnyChart.line();
@@ -160,7 +265,10 @@ public class Trend extends Fragment {
         set = Set.instantiate();
 
 
-        for ( SpinnerItem item : spinnerItems) {
+        for (int i = 0; i < spinnerItems.size(); i++) {
+            SpinnerItem item = spinnerItems.get(i);
+
+            //TREND VITAL_PARAMETER
             Line series = chart.line(set.mapAs(item.getMapping()));
             series.name(item.toString());
 
@@ -174,7 +282,13 @@ public class Trend extends Fragment {
                     .offsetX(5d)
                     .offsetY(5d);
 
-            item.setLine(series);
+            //Range
+            Range rangeMarker = chart.rangeMarker(i);
+            rangeMarker.axis(yAxis0);
+            rangeMarker.fill("#009900 0.4");
+            rangeMarker.enabled(false);
+
+            item.setLine(series, rangeMarker);
         }
 
         //just once
@@ -191,56 +305,31 @@ public class Trend extends Fragment {
         loadVitalValues(bar.getProgress() * 5);
     }
 
-    public void loadVitalValues(int numberOfDays) {
-        /*
 
-        [
-            {
-                "benutzer": "marie",
-                "praxis": "praxis",
-                "gewicht": 55.0,
-                "puls": 80.0,
-                "blutdruckSys": 180.0,
-                "blutdruckDia": 93.0,
-                "atemfrequenz": 85.0,
-                "timeStamp": "2020-05-20T11:03:56.4614718Z"  //format?
-            },
-            //....
-        ]
+    private void showData(SpinnerItem item) {
 
-         */
+        if (list != null) {
 
+            //set Data
+            set.data(list);
 
-        request(numberOfDays,  //
-                (JSONArray response) -> {
+            for (SpinnerItem i : spinnerItems) {
+                i.getLine().enabled(false);
+                i.getLegendItem().disabled();
+                i.getLegendItem().iconEnabled(false);
+                i.getLegendItem().text(".");
+                i.getRange().enabled(false);
+            }
 
-                    final int n = response.length();
+            item.getLine().enabled(true);
+            item.getLegendItem().enabled();
+            item.getLegendItem().iconEnabled(true);
+            item.getLegendItem().text(item.toString());
+            item.getRange().enabled(true);
 
-                    List<DataEntry> list = new ArrayList<>(n);
+            //Toast.makeText(getContext(), item.toString(), Toast.LENGTH_LONG).show();
 
-                    for (int i = 0; i < n; i++) {
-                        AnyChartDataEntry entry = AnyChartDataEntry.createFrom(_safeGet(response, i), i);
-                        if (entry != null) {
-                            Log.e(Trend.class.getSimpleName() + ".class", "entry " + i + " is " + entry.date.getTime());
-                            list.add(entry);
-                        } else {
-                            Log.e(Trend.class.getSimpleName() + ".class", "entry " + i + " is null");
-                        }
-                    }
-
-                    Trend.this.list = list;
-                    //Toast.makeText(getActivity(), "server: " + n + " chart: " + list.size(), Toast.LENGTH_LONG).show();
-
-                    Spinner spinner = root.findViewById(R.id.ddSeries);
-                    showData((SpinnerItem) spinner.getSelectedItem());
-
-                },  //
-                (Integer status) -> Toast.makeText(getActivity(), "Load Vital-Values Status " + status, Toast.LENGTH_LONG).show(), //
-                (VolleyError error) -> {
-                    String text = error.getMessage();
-                    Log.e("DEBUG", text == null ? "" : text);
-                    Toast.makeText(getActivity(), "Server unreachable: Could not load Vital-Values", Toast.LENGTH_LONG).show();
-                });
+        }
     }
 
     private JSONObject _safeGet(JSONArray response, int i) {
@@ -252,83 +341,40 @@ public class Trend extends Fragment {
         }
     }
 
-    private void request(int x, Response.Listener<JSONArray> onStatusOK, Response.Listener<Integer> onStatusNotOk, Response.ErrorListener onError) {
-        final JSONArray data = new JSONArray();
-        final StatusCode mStatusCode = new StatusCode();
-
-        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten/" + Globals.benutzer + "/" + x;
-        Log.e("Trend.class", "URL: " + url);
-
-        // Request a string response from the provided URL.
-        JsonArrayRequest stringRequest = new JsonArrayRequest( //
-                Request.Method.GET, //
-                url, //
-                data, //
-                (JSONArray response) -> {
-                    if (mStatusCode.get() == 200) {
-                        onStatusOK.onResponse(response);
-                    } else {
-                        onStatusNotOk.onResponse(mStatusCode.get());
-                    }
-                },//
-                onError) {
-            @Override
-            protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
-                if (response != null) {
-                    mStatusCode.set(response.statusCode);
-                    if (response.data.length == 0) {
-                        return Response.success(new JSONArray(), HttpHeaderParser.parseCacheHeaders(response));
-                    }
-                }
-                return super.parseNetworkResponse(response);
-            }
-        };
-
-        // Add the request to the RequestQueue.
-        requestQueue.add(stringRequest);
-    }
-
-
-    private void showData(SpinnerItem item) {
-
-        if (list != null) {
-
-            //set Data
-            set.data(list);
-
-            for ( SpinnerItem i : spinnerItems){
-                i.getLine().enabled(false);
-                i.getLegendItem().disabled();
-                i.getLegendItem().iconEnabled(false);
-                i.getLegendItem().text(".");
-            }
-
-            item.getLine().enabled(true);
-            item.getLegendItem().enabled();
-            item.getLegendItem().iconEnabled(true);
-            item.getLegendItem().text(item.toString());
-
-            //Toast.makeText(getContext(), item.toString(), Toast.LENGTH_LONG).show();
-
-        }
-    }
-
 
     static class SpinnerItem {
 
         private final String display;
         private final String mapping;
+        private final String jsonAttributeName;
         private Line line = null;
         private LegendItemSettings legendItem;
+        private Range range;
+        private double min;
+        private double max;
 
-        public SpinnerItem(String display, String mapping) {
+        public SpinnerItem(String display, String mapping, String jsonAttributeName) {
             this.display = Objects.requireNonNull(display);
             this.mapping = mapping;
+            this.jsonAttributeName = jsonAttributeName;
         }
 
-        public void setLine(Line line) {
+        public void setLine(Line line, Range rangeMarker) {
             this.line = line;
+            this.range = rangeMarker;
             this.legendItem = line.legendItem();
+
+            rangeMarker.from(min);
+            rangeMarker.to(max);
+        }
+
+        public void setRange(double min, double max) {
+            this.min = min;
+            this.max = max;
+        }
+
+        public String getJsonAttributeName() {
+            return jsonAttributeName;
         }
 
         public LegendItemSettings getLegendItem() {
@@ -337,6 +383,10 @@ public class Trend extends Fragment {
 
         public Line getLine() {
             return line;
+        }
+
+        public Range getRange() {
+            return range;
         }
 
         public String getMapping() {
