@@ -65,6 +65,7 @@ public class ContactPersonFragment extends Fragment {
     private void updateContactPerson() {
         try {
             KontaktDto kontakt = extractFromForm();
+            getActivity().getIntent().putExtra("contact_email", kontakt.getEmail());
             FirestoreKontaktService.updateKontakt(getActivity().getIntent().getStringExtra("user_uid"), kontakt);
             Toast.makeText(this.getContext(), "Kontaktdaten wurden gespeichert", Toast.LENGTH_LONG).show();
         } catch(ValidationException exc ) {

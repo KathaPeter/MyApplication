@@ -11,32 +11,38 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.myapplication.service.FirestoreFormularService;
-import com.example.myapplication.service.StatusCode;
+import com.example.myapplication.service.HealthCareServerTrendService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Input_VitalParameter extends Fragment {
 
     private View root;
     private RequestQueue requestQueue;
+    private ArrayList<Helper.ParseInfo> parseInfos;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         requestQueue = Volley.newRequestQueue(getActivity());
+
+        parseInfos = new ArrayList<Helper.ParseInfo>();
+        parseInfos.add(new Helper.ParseInfo(R.id.gewicht, "gewicht", "Gewicht", 10, 180));
+        parseInfos.add(new Helper.ParseInfo(R.id.puls, "puls", "Puls", 5, 140));
+        parseInfos.add(new Helper.ParseInfo(R.id.blutdruck_systolisch, "blutdruckSys", "Blutdruck (sys)", 30, 190));
+        parseInfos.add(new Helper.ParseInfo(R.id.blutdruck_diastolisch, "blutdruckDia", "Blutdruck (dias)", 30, 230));
+        parseInfos.add(new Helper.ParseInfo(R.id.atemfrequenz, "atemfrequenz", "Atemfrequenz", 10, 180));
+
     }
 
     @Override
@@ -68,65 +74,36 @@ public class Input_VitalParameter extends Fragment {
         }
          */
 
-        JSONObject data = new JSONObject();
+        final JSONObject data = new JSONObject();
+        final List<String> listOutOfLimits = new ArrayList<>();
+        final Bundle extras = getActivity().getIntent().getExtras();
         try {
 
-            Helper.viewToJSONDecimal(root, data, R.id.gewicht, "gewicht");
-            Helper.viewToJSONDecimal(root, data, R.id.puls, "puls");
-            Helper.viewToJSONDecimal(root, data, R.id.blutdruck_systolisch, "blutdruckSys");
-            Helper.viewToJSONDecimal(root, data, R.id.blutdruck_diastolisch, "blutdruckDia");
-            Helper.viewToJSONDecimal(root, data, R.id.atemfrequenz, "atemfrequenz");
+            for (Helper.ParseInfo info : parseInfos) {
+                Helper.viewToJSONDecimal(root, data, info, extras, listOutOfLimits);
+            }
 
             data.put("timeStamp", "0001-01-01T00:00:00");
             data.put("benutzer", getActivity().getIntent().getExtras().getString("patient_vorname"));
             data.put("praxis", "praxis"); //TODO
 
+            String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten";
 
-            //TemporalStorage for HTTP StatusCode
-            final StatusCode mStatusCode = new StatusCode();
-
-            // Request a string response from the provided URL.
-            JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten", data, //
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.e(Input_VitalParameter.class.getSimpleName() + ".class", "SendVitalParam Status: [" + mStatusCode.get() + "]");
-                            if (mStatusCode.get() == 200) {
-                                Toast.makeText(getActivity(), "Send successfull", Toast.LENGTH_LONG).show();
-                                FirestoreFormularService.updateFormularDate(getActivity().getIntent().getStringExtra("user_uid"));
-                            } else {
-                                Toast.makeText(getActivity(), "Send returned " + mStatusCode.get(), Toast.LENGTH_LONG).show();
-                            }
+            HealthCareServerTrendService.request(requestQueue, url, data,
+                    (JSONObject response) -> {
+                        Toast.makeText(getActivity(), "Send successfull", Toast.LENGTH_LONG).show();
+                        FirestoreFormularService.updateFormularDate(getActivity().getIntent().getStringExtra("user_uid"));
+                        if (listOutOfLimits.size() > 0) {
+                            sendLimitContactPerson(listOutOfLimits);
                         }
                     }, //
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            String text = error.getMessage();
-                            Log.e(Input_VitalParameter.class.getSimpleName() + ".class", text == null ? "<null>" : text);
-                            Toast.makeText(getActivity(), "Send returned with error", Toast.LENGTH_LONG).show();
-                        }
-                    }) {
+                    (Integer status) -> Toast.makeText(getActivity(), "Send returned " + status, Toast.LENGTH_LONG).show(),
+                    (VolleyError error) -> {
+                        String text = error.getMessage();
+                        Log.e(Input_VitalParameter.class.getSimpleName() + ".class", text == null ? "<null>" : text);
+                        Toast.makeText(getActivity(), "Send returned with error", Toast.LENGTH_LONG).show();
 
-                @Override
-                protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                    if (response != null) {
-                        mStatusCode.set(response.statusCode);
-                    }
-                    if (response.data.length == 0) { //HACK data.length == empty
-                        try {
-                            return Response.success(new JSONObject(), HttpHeaderParser.parseCacheHeaders(response));
-                        } catch (Exception exc) {
-                            return Response.error(new ParseError(exc));
-                        }
-                    }
-                    return super.parseNetworkResponse(response);
-                }
-
-            };
-
-            // Add the request to the RequestQueue.
-            requestQueue.add(stringRequest);
+                    });
 
         } catch (JSONException e) {
             //SHOULD NEVER HAPPEN checked
@@ -135,6 +112,50 @@ public class Input_VitalParameter extends Fragment {
             Toast.makeText(getActivity(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
+    private void sendLimitContactPerson(final List<String> listOutOfLimits) {
+
+        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.port2HealthCare;
+
+        Bundle extras = getActivity().getIntent().getExtras();
+        final String vorname = extras.getString("patient_vorname");
+        final String nachname = extras.getString("patient_name");
+        final String kontaktmail = extras.getString("contact_email");
+
+        for (String type : listOutOfLimits) {
+
+            /*
+            {
+	            "Vorname": "vorame",
+                "Name": "name",
+	            "Grenzwert": "typ",
+	            "Kontaktmail": "email"
+            }
+            */
+
+            JSONObject data = new JSONObject();
+            try {
+                data.put("Vorname", vorname);
+                data.put("Name", nachname);
+                data.put("Grenzwert", type);
+                data.put("Kontaktmail", kontaktmail);
+            } catch (JSONException e) {
+                Log.e(Input_VitalParameter.class.getSimpleName() + ".class", "Exception: " + e.getMessage());
+            }
+
+            HealthCareServerTrendService.request(requestQueue, url, data, (JSONObject response) -> {
+                    }, //
+                    (Integer status) -> Toast.makeText(getActivity(), "Send ValueOutOfLimit returned " + status, Toast.LENGTH_LONG).show(),
+                    (VolleyError error) -> {
+                        String text = error.getMessage();
+                        Log.e(Input_VitalParameter.class.getSimpleName() + ".class", text == null ? "<null>" : text);
+                        Toast.makeText(getActivity(), "Send ValueOutOfLimit returned with error", Toast.LENGTH_LONG).show();
+
+                    });
+
+        }
+    }
+
 
 }
 

@@ -71,11 +71,13 @@ public class Trend extends Fragment {
         spinnerItems.add(new SpinnerItem("Gewicht", "{ x: 'x', value: 'value' }", "gewicht"));
         spinnerItems.add(new SpinnerItem("Puls", "{ x: 'x', value: 'value2' }", "puls"));
         spinnerItems.add(new SpinnerItem("Blutdruck (sys)", "{ x: 'x', value: 'value3' }", "blutdruckSys"));
-        spinnerItems.add(new SpinnerItem("Blutdruck (dias)", "{ x: 'x', value: 'value4' }", "blutdruckDia"));
+        spinnerItems.add(new SpinnerItem("Blutdruck (dias)", "{ x: 'x', value: 'value4' }", "BlutdruckDia"));
         spinnerItems.add(new SpinnerItem("Atemfrequenz", "{ x: 'x', value: 'value5' }", "atemfrequenz"));
 
-        loadLimitValues();
         initAnyChart();
+
+        loadLimitValues();
+
 
         Spinner spinner = root.findViewById(R.id.ddSeries);
 
@@ -117,60 +119,30 @@ public class Trend extends Fragment {
         return root;
     }
 
-    private void loadLimitValues() {
+    @Override
+    public void onStart() {
+        super.onStart();
 
-
-        final String benutzer = Objects.requireNonNull(Objects.requireNonNull(getActivity()).getIntent().getExtras()).getString("patient_vorname");
-        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/Alarm/" + benutzer;
-
-        HealthCareServerTrendService.request(//
-                requestQueue, //
-                url,  //
-                (JSONArray response) -> {
-
-                    final int n = response.length();
-
-                    List<DataEntry> list = new ArrayList<>(n);
-
-                    for (int i = 0; i < n; i++) {
-
-                        String check = null;
-                        double min = -1;
-                        double max = -1;
-                        try {
-                            JSONObject jsonObject = _safeGet(response, i);
-                            check = jsonObject.getString("check");
-                            min = jsonObject.getDouble("min");
-                            max = jsonObject.getDouble("max");
-                        } catch (JSONException exc) {
-
-                        }
-
-                        SpinnerItem itemFound = null;
-                        for (SpinnerItem item : spinnerItems) {
-                            if (item.getJsonAttributeName().compareTo(check) == 0) {
-                                itemFound = item;
-                                break;
-                            }
-                        }
-
-                        if (itemFound == null) {
-                            Log.e("Trend.class", "LoadLimit: unknown JSONObject check <" + check + ">");
-                        } else {
-                            itemFound.setRange(min, max);
-                        }
-                    }
-                },  //
-                (Integer status) -> Toast.makeText(getActivity(), "Load Vital-Values Status " + status, Toast.LENGTH_LONG).show(), //
-                (VolleyError error) -> {
-                    String text = error.getMessage();
-                    Log.e("DEBUG", text == null ? "" : text);
-                    Toast.makeText(getActivity(), "Server unreachable: Could not load Vital-Values", Toast.LENGTH_LONG).show();
-                });
-
+        SeekBar bar = root.findViewById(R.id.barDays);
+        loadVitalValues(bar.getProgress() * 5);
     }
 
-    public void loadVitalValues(int numberOfDays) {
+    public void loadLimitValues() {
+
+        Bundle extras = getActivity().getIntent().getExtras();
+        for (SpinnerItem item : spinnerItems) {
+
+            double min = extras.getDouble(item.getJsonAttributeName()+"MIN");
+            double max = extras.getDouble(item.getJsonAttributeName()+"MAX");
+
+            item.storeRangeValue(min, max);
+        }
+
+        Spinner spinner = root.findViewById(R.id.ddSeries);
+        showData((Trend.SpinnerItem) spinner.getSelectedItem());
+    }
+
+    private void loadVitalValues(int numberOfDays) {
         /*
 
         [
@@ -189,7 +161,8 @@ public class Trend extends Fragment {
 
          */
 
-        final String benutzer = Objects.requireNonNull(Objects.requireNonNull(getActivity()).getIntent().getExtras()).getString("patient_vorname");
+        final String benutzer = getActivity().getIntent().getStringExtra("patient_vorname");
+
         final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten/" + benutzer + "/" + numberOfDays;
 
         HealthCareServerTrendService.request(//
@@ -264,6 +237,13 @@ public class Trend extends Fragment {
 
         set = Set.instantiate();
 
+        //Range
+        Range rangeMarker = chart.rangeMarker(0);
+        rangeMarker.axis(yAxis0);
+        rangeMarker.fill("#009900 0.4");
+        rangeMarker.enabled(true);
+        rangeMarker.from(10.0);
+        rangeMarker.to(15.0);
 
         for (int i = 0; i < spinnerItems.size(); i++) {
             SpinnerItem item = spinnerItems.get(i);
@@ -282,12 +262,6 @@ public class Trend extends Fragment {
                     .offsetX(5d)
                     .offsetY(5d);
 
-            //Range
-            Range rangeMarker = chart.rangeMarker(i);
-            rangeMarker.axis(yAxis0);
-            rangeMarker.fill("#009900 0.4");
-            rangeMarker.enabled(false);
-
             item.setLine(series, rangeMarker);
         }
 
@@ -297,13 +271,7 @@ public class Trend extends Fragment {
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
 
-        SeekBar bar = root.findViewById(R.id.barDays);
-        loadVitalValues(bar.getProgress() * 5);
-    }
 
 
     private void showData(SpinnerItem item) {
@@ -326,9 +294,12 @@ public class Trend extends Fragment {
             item.getLegendItem().iconEnabled(true);
             item.getLegendItem().text(item.toString());
             item.getRange().enabled(true);
+            item.initRange();
 
             //Toast.makeText(getContext(), item.toString(), Toast.LENGTH_LONG).show();
 
+        } else {
+            Log.e("Trend.class", "showData list is null");
         }
     }
 
@@ -350,8 +321,8 @@ public class Trend extends Fragment {
         private Line line = null;
         private LegendItemSettings legendItem;
         private Range range;
-        private double min;
-        private double max;
+        private double min = 10.0;
+        private double max = 20.0;
 
         public SpinnerItem(String display, String mapping, String jsonAttributeName) {
             this.display = Objects.requireNonNull(display);
@@ -363,12 +334,14 @@ public class Trend extends Fragment {
             this.line = line;
             this.range = rangeMarker;
             this.legendItem = line.legendItem();
-
-            rangeMarker.from(min);
-            rangeMarker.to(max);
         }
 
-        public void setRange(double min, double max) {
+        public void initRange() {
+            range.from(min);
+            range.to(max);
+        }
+
+        public void storeRangeValue(double min, double max) {
             this.min = min;
             this.max = max;
         }

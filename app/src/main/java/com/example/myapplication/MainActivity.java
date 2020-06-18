@@ -10,10 +10,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.data.PatientDto;
+import com.example.myapplication.service.FirestorePatientService;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import static com.example.myapplication.service.FirestorePatientService.getPatientData;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,9 +34,7 @@ public class MainActivity extends AppCompatActivity {
         String userPWD = pwdInput.getText().toString().trim();
 
         if (Globals.USE_UID_AS_USER != null) {
-            Intent intent = prepareIntentForWelcome(Globals.USE_UID_AS_USER);
-            intent.putExtra("user_email", "<dummyLogin>");
-            startActivityForResult(intent, 1);
+            login_success(Globals.USE_UID_AS_USER, "<dummyLogin>", 1);
         } else if (userEMail.length() == 0 || userPWD.length() == 0) {
             Toast.makeText(getApplicationContext(), "EMail and Password required!",
                     Toast.LENGTH_LONG).show();
@@ -41,9 +46,7 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(getApplicationContext(), "Login erfolgreich", Toast.LENGTH_LONG).show();
                             Log.d(MainActivity.class.toString(), "signInWithEmailAndPassword:success");
-                            Intent intent = prepareIntentForWelcome(task.getResult().getUser().getUid());
-                            intent.putExtra("user_email", userEMail);
-                            startActivityForResult(intent, 2);
+                            login_success(task.getResult().getUser().getUid(), userEMail, 2);
                         } else {
                             authenticationFailed(task.getException());
                         }
@@ -67,13 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == 2) {
             mAuth.signOut();
-        } else if (requestCode == 1) {
-            //NO logout needed
-        } else {
-            //??
         }
 
-        Log.d("MainActivity.class", "onActivityResult: " + requestCode + " " + resultCode + " "+ data);
     }
 
     @Override
@@ -95,18 +93,40 @@ public class MainActivity extends AppCompatActivity {
             Log.d(MainActivity.class.toString(), "onStart getCurrentUser:success");
             Toast.makeText(getApplicationContext(), "Willkommen zurück",
                     Toast.LENGTH_LONG).show();
-            Intent intent = prepareIntentForWelcome(currentUser.getUid());
-            intent.putExtra("user_email", currentUser.getEmail());
-            startActivityForResult(intent, 2);
+
+            login_success(currentUser.getUid(), currentUser.getEmail(),  2);
+
+
+
+
         } else {
             Log.d(MainActivity.class.toString(), "onStart signInWithEmailAndPassword:failure");
         }
 
     }
 
-    private Intent prepareIntentForWelcome(String userID) {
-        Intent intent = new Intent(this, WelcomeActivity.class);
-        intent.putExtra("user_uid", userID);
-        return intent;
+    private void login_success(final String uid, final String email, final int requestCode) {
+        Task<DocumentSnapshot> getPatientDataTask = getPatientData(uid);
+        getPatientDataTask.addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                PatientDto patientDto = documentSnapshot.toObject(PatientDto.class);
+
+                Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+                intent.putExtra("user_uid", uid);
+                intent.putExtra("user_email", email);
+                intent.putExtra("patient_name", patientDto.name);
+                intent.putExtra("patient_vorname", patientDto.vorname);
+
+
+                startActivityForResult(intent, requestCode);
+            }
+
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(WelcomeActivity.class.toString(), "getPatientDataTask:failure", e);
+            }
+        });
     }
 }
