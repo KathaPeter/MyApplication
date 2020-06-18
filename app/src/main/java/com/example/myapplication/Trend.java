@@ -39,7 +39,6 @@ import com.example.myapplication.data.AnyChartDataEntry;
 import com.example.myapplication.service.HealthCareServerTrendService;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -74,22 +73,21 @@ public class Trend extends Fragment {
         spinnerItems.add(new SpinnerItem("Blutdruck (dias)", "{ x: 'x', value: 'value4' }", "BlutdruckDia"));
         spinnerItems.add(new SpinnerItem("Atemfrequenz", "{ x: 'x', value: 'value5' }", "atemfrequenz"));
 
-        initAnyChart();
-
-        loadLimitValues();
-
-
         Spinner spinner = root.findViewById(R.id.ddSeries);
-
 
         ArrayAdapter<SpinnerItem> arrayAdapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), android.R.layout.simple_spinner_item, spinnerItems);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
+        spinner.setSelection(0);
+
+        initAnyChart();
+
+        loadLimitValues();
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
-
                 showData(item);
             }
 
@@ -122,7 +120,6 @@ public class Trend extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
         SeekBar bar = root.findViewById(R.id.barDays);
         loadVitalValues(bar.getProgress() * 5);
     }
@@ -132,8 +129,8 @@ public class Trend extends Fragment {
         Bundle extras = getActivity().getIntent().getExtras();
         for (SpinnerItem item : spinnerItems) {
 
-            double min = extras.getDouble(item.getJsonAttributeName()+"MIN");
-            double max = extras.getDouble(item.getJsonAttributeName()+"MAX");
+            double min = extras.getDouble(item.getJsonAttributeName() + "MIN");
+            double max = extras.getDouble(item.getJsonAttributeName() + "MAX");
 
             item.storeRangeValue(min, max);
         }
@@ -272,8 +269,6 @@ public class Trend extends Fragment {
     }
 
 
-
-
     private void showData(SpinnerItem item) {
 
         if (list != null) {
@@ -289,17 +284,18 @@ public class Trend extends Fragment {
                 i.getRange().enabled(false);
             }
 
-            item.getLine().enabled(true);
-            item.getLegendItem().enabled();
-            item.getLegendItem().iconEnabled(true);
-            item.getLegendItem().text(item.toString());
-            item.getRange().enabled(true);
-            item.initRange();
 
-            //Toast.makeText(getContext(), item.toString(), Toast.LENGTH_LONG).show();
+            if (item != null) {
+                item.getLine().enabled(true);
+                item.getLegendItem().enabled();
+                item.getLegendItem().iconEnabled(true);
+                item.getLegendItem().text(item.toString());
+                item.getRange().enabled(true);
+                item.initRange();
+            } //else {
+            // Toast.makeText(getContext(), "SpinnerItem is NULL", Toast.LENGTH_LONG).show();
+            //}
 
-        } else {
-            Log.e("Trend.class", "showData list is null");
         }
     }
 

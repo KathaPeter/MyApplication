@@ -88,10 +88,8 @@ public class Helper {
     public static class ParseInfo {
 
         public final int fieldId;
-
         public final String jsonAttrib;
         public final String displayName;
-
         public final double dMinBound;
         public final double dMaxBound;
 

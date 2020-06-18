@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.anychart.chart.common.dataentry.DataEntry;
@@ -71,6 +72,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private RequestQueue requestQueue;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -121,42 +124,51 @@ public class WelcomeActivity extends AppCompatActivity {
         HealthCareServerTrendService.request(//
                 requestQueue, //
                 url,  //
-                (JSONArray response) -> {
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
 
-                    final int n = response.length();
+                        final int n = response.length();
 
-                    List<DataEntry> list = new ArrayList<>(n);
+                        List<DataEntry> list = new ArrayList<>(n);
 
-                    for (int i = 0; i < n; i++) {
+                        for (int i = 0; i < n; i++) {
 
-                        String check = null;
-                        double min = -1;
-                        double max = -1;
-                        try {
-                            JSONObject jsonObject = response.getJSONObject(i);
-                            check = jsonObject.getString("check");
-                            min = jsonObject.getDouble("min");
-                            max = jsonObject.getDouble("max");
-                        } catch (JSONException exc) {
+                            String check = null;
+                            double min = -1;
+                            double max = -1;
+                            try {
+                                JSONObject jsonObject = response.getJSONObject(i);
+                                check = jsonObject.getString("check");
+                                min = jsonObject.getDouble("min");
+                                max = jsonObject.getDouble("max");
+                            } catch (JSONException exc) {
+
+                            }
+
+                            WelcomeActivity.this.getIntent().putExtra(check + "MIN", min);
+                            WelcomeActivity.this.getIntent().putExtra(check + "MAX", max);
 
                         }
 
-                        getIntent().putExtra(check + "MIN", min);
-                        getIntent().putExtra(check + "MAX", max);
+                        if (trends != null) {
+                            trends.loadLimitValues();
+                        }
 
                     }
-
-                    if (trends != null) {
-                        trends.loadLimitValues();
-                    }
-
                 },  //
-                (Integer status) -> Toast.makeText(this, "Load Limit-Values Status " + status, Toast.LENGTH_LONG).show(), //
+                new Response.Listener<Integer>() {
+                    @Override
+                    public void onResponse(Integer status) {
+                        Toast.makeText(WelcomeActivity.this, "Load Limit-Values Status " + status, Toast.LENGTH_LONG).show();
+                    }
+                }, //
                 (VolleyError error) -> {
                     String text = error.getMessage();
                     Log.e("DEBUG", text == null ? "" : text);
                     Toast.makeText(this, "Server unreachable: Could not load Limit-Values", Toast.LENGTH_LONG).show();
                 });
     }
+
 
 }

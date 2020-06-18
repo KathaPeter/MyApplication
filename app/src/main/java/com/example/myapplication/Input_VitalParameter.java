@@ -34,6 +34,7 @@ public class Input_VitalParameter extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //Volley: Ein Werkzeug um ein RESTful-System zwischen einem Client und einem Remote-Backend zu entwickeln.
         requestQueue = Volley.newRequestQueue(getActivity());
 
         parseInfos = new ArrayList<Helper.ParseInfo>();
@@ -143,6 +144,7 @@ public class Input_VitalParameter extends Fragment {
                 Log.e(Input_VitalParameter.class.getSimpleName() + ".class", "Exception: " + e.getMessage());
             }
 
+            //
             HealthCareServerTrendService.request(requestQueue, url, data, (JSONObject response) -> {
                     }, //
                     (Integer status) -> Toast.makeText(getActivity(), "Send ValueOutOfLimit returned " + status, Toast.LENGTH_LONG).show(),
