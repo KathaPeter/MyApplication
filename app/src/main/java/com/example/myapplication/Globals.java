@@ -23,6 +23,12 @@ public class Globals {
             + "Drücken Sie Ja um Ihre Daten zu übermitteln.\n"  //
             + "Drücken Sie Nein um Ihre Daten nochmals zu überprüfen.";
 
+    public final static String qClearVitalParam = "" //
+            + "Leeren\n\n"   //
+            + "Wollen Sie Ihre Eingaben leeren?\n" //
+            + "Drücken Sie Ja um Ihre Eingaben zu leeren.\n"  //
+            + "Drücken Sie Nein um Ihre Eingaben nochmals zu überprüfen.";
+
     public final static String qSavePatientData = "Speichern\n\n" //
             + "Wollen Sie Ihre Daten aktualisieren?\n"    //
             + "Drücken Sie auf Ja, wenn Sie diese aktualisieren möchten.\n"    //
@@ -35,7 +41,7 @@ public class Globals {
 
     
 
-    public final static String USE_UID_AS_USER = "TTW8PLIAjWZUrl92ap5DHyv3gx42"; //FIXME make null
+    public final static String USE_UID_AS_USER = null; //"TTW8PLIAjWZUrl92ap5DHyv3gx42"; //FIXME make null
     public final static boolean filterTrendsPerDay = true; //FIXME make true
     public final static boolean useDummyVitalValues = false; //FIXME make false
 

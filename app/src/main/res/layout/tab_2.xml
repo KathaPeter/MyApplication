@@ -3,6 +3,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -16,20 +17,48 @@
 
     </com.anychart.AnyChartView>
 
-    <Spinner
-        android:id="@+id/ddSeries"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_weight="0.05" />
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="10px">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vitalwert:"
+            android:textSize="14sp" />
+
+        <Spinner
+            android:id="@+id/ddSeries"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05"
+        android:gravity="center"
+        android:text="Daten der letzten Tage (schrittweise 5 Tage):" />
 
     <SeekBar
         android:id="@+id/barDays"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_weight="0.05"
+        android:layout_height="wrap_content"
         android:max="18"
         android:progress="3" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05" />
 
 
 </LinearLayout>

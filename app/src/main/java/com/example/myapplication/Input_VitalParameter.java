@@ -1,14 +1,17 @@
 package com.example.myapplication;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.android.volley.RequestQueue;
@@ -29,10 +32,17 @@ public class Input_VitalParameter extends Fragment {
     private View root;
     private RequestQueue requestQueue;
     private ArrayList<Helper.ParseInfo> parseInfos;
+    private Drawable errorBackgground = null;
+    private Drawable inputBackgground = null;
+    private Trend trends = null;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        errorBackgground = ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.background_error);
+        inputBackgground = ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.background_input);
 
         //Volley: Ein Werkzeug um ein RESTful-System zwischen einem Client und einem Remote-Backend zu entwickeln.
         requestQueue = Volley.newRequestQueue(getActivity());
@@ -57,7 +67,27 @@ public class Input_VitalParameter extends Fragment {
             new DialogYesNo(getActivity(), Globals.qSendVitalParam, Input_VitalParameter.this::sendVitalParam, null);
         });
 
+        Button buttonClear = (Button) root.findViewById(R.id.bt_clear);
+        buttonClear.setOnClickListener((View v) -> {
+            new DialogYesNo(getActivity(), Globals.qClearVitalParam, Input_VitalParameter.this::emptyVitalParams, null);
+        });
+
+        emptyVitalParams();
         return root;
+    }
+
+    private void emptyVitalParams() {
+        clear(R.id.blutdruck_diastolisch);
+        clear(R.id.blutdruck_systolisch);
+        clear(R.id.atemfrequenz);
+        clear(R.id.puls);
+        clear(R.id.gewicht);
+    }
+
+    private void clear(int fieldId) {
+        EditText view = (EditText) root.findViewById(fieldId);
+        view.setBackground(inputBackgground);
+        view.setText("");
     }
 
     private void sendVitalParam() {
@@ -78,24 +108,42 @@ public class Input_VitalParameter extends Fragment {
         final JSONObject data = new JSONObject();
         final List<String> listOutOfLimits = new ArrayList<>();
         final Bundle extras = getActivity().getIntent().getExtras();
-        try {
+        final List<ValidationException> errors = new ArrayList<>();
 
-            for (Helper.ParseInfo info : parseInfos) {
+
+        for (Helper.ParseInfo info : parseInfos) {
+            try {
+                //Rotes Feld wieder Schwarz markieren
+                root.findViewById(info.fieldId).setBackground(inputBackgground);
                 Helper.viewToJSONDecimal(root, data, info, extras, listOutOfLimits);
+            } catch (ValidationException e) {
+                e.getField().setBackground(errorBackgground);
+                errors.add(e);
             }
+        }
 
-            data.put("timeStamp", "0001-01-01T00:00:00");
-            data.put("benutzer", getActivity().getIntent().getExtras().getString("patient_vorname"));
-            data.put("praxis", "praxis"); //TODO
+        if (errors.isEmpty()) {
+            try {
+                data.put("timeStamp", "0001-01-01T00:00:00");
+                data.put("benutzer", getActivity().getIntent().getExtras().getString("patient_vorname"));
+                data.put("praxis", "praxis"); //TODO
+            } catch (JSONException exc) {
+                //should never HAPPEN
+                exc.printStackTrace();
+            }
 
             String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten";
 
             HealthCareServerTrendService.request(requestQueue, url, data,
                     (JSONObject response) -> {
-                        Toast.makeText(getActivity(), "Send successfull", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Erfolgreich gesendet", Toast.LENGTH_LONG).show();
                         FirestoreFormularService.updateFormularDate(getActivity().getIntent().getStringExtra("user_uid"));
                         if (listOutOfLimits.size() > 0) {
                             sendLimitContactPerson(listOutOfLimits);
+                        }
+                        //inform Trends
+                        if ( trends != null ) {
+                            trends.refresh();
                         }
                     }, //
                     (Integer status) -> Toast.makeText(getActivity(), "Send returned " + status, Toast.LENGTH_LONG).show(),
@@ -106,13 +154,11 @@ public class Input_VitalParameter extends Fragment {
 
                     });
 
-        } catch (JSONException e) {
-            //SHOULD NEVER HAPPEN checked
-            e.printStackTrace();
-        } catch (ValidationException e) {
-            Toast.makeText(getActivity(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getActivity(), errors.get(0).getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
 
     private void sendLimitContactPerson(final List<String> listOutOfLimits) {
 
@@ -159,6 +205,9 @@ public class Input_VitalParameter extends Fragment {
     }
 
 
+    public void setListener(Trend trends) {
+        this.trends = trends;
+    }
 }
 
 

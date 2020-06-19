@@ -70,7 +70,7 @@ public class Trend extends Fragment {
         spinnerItems.add(new SpinnerItem("Gewicht", "{ x: 'x', value: 'value' }", "gewicht"));
         spinnerItems.add(new SpinnerItem("Puls", "{ x: 'x', value: 'value2' }", "puls"));
         spinnerItems.add(new SpinnerItem("Blutdruck (sys)", "{ x: 'x', value: 'value3' }", "blutdruckSys"));
-        spinnerItems.add(new SpinnerItem("Blutdruck (dias)", "{ x: 'x', value: 'value4' }", "BlutdruckDia"));
+        spinnerItems.add(new SpinnerItem("Blutdruck (dias)", "{ x: 'x', value: 'value4' }", "blutdruckDia"));
         spinnerItems.add(new SpinnerItem("Atemfrequenz", "{ x: 'x', value: 'value5' }", "atemfrequenz"));
 
         Spinner spinner = root.findViewById(R.id.ddSeries);
@@ -120,8 +120,7 @@ public class Trend extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        SeekBar bar = root.findViewById(R.id.barDays);
-        loadVitalValues(bar.getProgress() * 5);
+        refresh();
     }
 
     public void loadLimitValues() {
@@ -273,6 +272,20 @@ public class Trend extends Fragment {
 
         if (list != null) {
 
+            if (list.size() > 0) {
+                boolean allSame = true;
+                String compareTo = list.get(0).getValue("x") + "";
+                for (DataEntry entry : list) {
+                    if (compareTo.compareTo(entry.getValue("x") + "") != 0) {
+                        allSame = false;
+                        break;
+                    }
+                }
+                if (allSame) {
+                    list.add(0, new AnyChartDataEntry((AnyChartDataEntry) list.get(list.size() - 1)));
+                }
+            }
+
             //set Data
             set.data(list);
 
@@ -306,6 +319,15 @@ public class Trend extends Fragment {
             Log.e(Trend.class.getSimpleName() + ".class", "ParseError: " + e.getMessage());
             return null;
         }
+    }
+
+    public void refresh() {
+        int days = 5;
+        if ( root != null ) {
+            SeekBar bar = root.findViewById(R.id.barDays);
+            days = bar.getProgress() * 5;
+        }
+        loadVitalValues(days);
     }
 
 

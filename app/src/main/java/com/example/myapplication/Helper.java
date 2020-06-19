@@ -15,25 +15,7 @@ import java.util.List;
 
 public class Helper {
 
-    public static void jsonToView(View root, JSONObject data, int fieldId, String jsonAttrib) throws JSONException {
-        //findViewById
-        EditText field = (EditText) root.findViewById(fieldId);
-        field.setText(data.getString(jsonAttrib));
-    }
-
-    public static void viewToJSON(View root, JSONObject data, int fieldId, String jsonAttrib) throws JSONException, ValidationException {
-
-        EditText field = (EditText) root.findViewById(fieldId);
-        String text = field.getText().toString();
-
-        if (text.trim().length() == 0) {
-            throw new ValidationException("Empty field");
-        }
-
-        data.put(jsonAttrib, text);
-    }
-
-    public static void viewToJSONDecimal(View root, JSONObject data, ParseInfo info, Bundle extras, List<String> listOutOfLimits) throws JSONException, ValidationException {
+    public static void viewToJSONDecimal(View root, JSONObject data, ParseInfo info, Bundle extras, List<String> listOutOfLimits) throws ValidationException {
 
         EditText field = (EditText) root.findViewById(info.fieldId);
 
@@ -41,7 +23,7 @@ public class Helper {
         String text = field.getText().toString().trim();
         if (text.length() == 0) {
             Log.i("DEBUG", "Empty field");
-            throw new ValidationException("Empty field");
+            throw new ValidationException("Leeres Feld vorhanden.", field);
         }
 
         //PARSE
@@ -49,12 +31,12 @@ public class Helper {
         try {
             number = Double.parseDouble(text);
         } catch (Exception e) {
-            throw new ValidationException(e.getMessage());
+            throw new ValidationException("Konvertierungsfehler. Text -> Zahl", field);
         }
 
         //test Bound
         if (number < info.dMinBound || number > info.dMaxBound) {
-            throw new ValidationException("Value <" + number + "> Out of Range [" + info.dMinBound + ";" + info.dMaxBound + "]");
+            throw new ValidationException("Wert <" + number + "> unrealistisch.", field);
         }
 
         //test Limit
@@ -65,12 +47,12 @@ public class Helper {
             listOutOfLimits.add(info.displayName);
         }
 
-        data.put(info.jsonAttrib, number);
-    }
-
-    public static void documentToView(View root, DocumentSnapshot data, int fieldId, String attributeName) {
-        EditText field = (EditText) root.findViewById(fieldId);
-        field.setText(data.getString(attributeName));
+        try {
+            data.put(info.jsonAttrib, number);
+        }catch(JSONException exc) {
+            //Sollte nie passieren!
+            throw new ValidationException("Interner Fehler", field);
+        }
     }
 
     public static String validate(View root, int fieldId) throws ValidationException {
@@ -79,7 +61,7 @@ public class Helper {
         String text = field.getText().toString().trim();
 
         if (text.length() == 0) {
-            throw new ValidationException(("Empty Field "));
+            throw new ValidationException("Leeres Feld vorhanden.", field);
         }
 
         return text;

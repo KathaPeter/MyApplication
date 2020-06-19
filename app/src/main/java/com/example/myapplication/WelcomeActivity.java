@@ -36,6 +36,7 @@ import java.util.List;
 public class WelcomeActivity extends AppCompatActivity {
 
     private Trend trends = null;
+    private Input_VitalParameter input = null;
 
     private final FragmentPagerAdapter pagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         @Override
@@ -50,11 +51,15 @@ public class WelcomeActivity extends AppCompatActivity {
             switch (i) {
                 default:
                 case 0:
-                    fragment = new Input_VitalParameter();
+                    input = new Input_VitalParameter();
+                    input.setListener(trends);
+                    fragment = input;
                     break;
 
                 case 1:
                     trends = new Trend();
+                    if (input != null)
+                        input.setListener(trends);
                     fragment = trends;
                     break;
 
@@ -71,7 +76,6 @@ public class WelcomeActivity extends AppCompatActivity {
     };
 
     private RequestQueue requestQueue;
-
 
 
     @Override

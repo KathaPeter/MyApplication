@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.example.myapplication.Globals;
 
@@ -26,10 +27,18 @@ public class AnyChartDataEntry extends ValueDataEntry {
         setValue("value3", value3);
         setValue("value4", value4);
         setValue("value5", value5);
-        setValue("date", date.toString());
-
-
     }
+
+    public AnyChartDataEntry(AnyChartDataEntry entry) {
+        super("", 0.0);
+        this.date = entry.date;
+        setValue("value", entry.getValue("value") + "");
+        setValue("value2", entry.getValue("value2") + "");
+        setValue("value3", entry.getValue("value3") + "");
+        setValue("value4", entry.getValue("value4") + "");
+        setValue("value5", entry.getValue("value5") + "");
+    }
+
 
     public static AnyChartDataEntry createFrom(JSONObject o, int index) {
         if (o == null) {
@@ -51,7 +60,7 @@ public class AnyChartDataEntry extends ValueDataEntry {
                             calendar.get(Calendar.DAY_OF_MONTH);
 
             if (!Globals.filterTrendsPerDay) {
-                xValue += "_" + (char) ('a'+index);
+                xValue += "_" + (char) ('a' + index);
             }
             return new AnyChartDataEntry(xValue, dGewicht, dPuls, dBlutSys, dBlutDias, dAtemFreq, calendar);
         } catch (Exception exc) {

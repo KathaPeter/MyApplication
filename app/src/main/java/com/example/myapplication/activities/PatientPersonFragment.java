@@ -64,7 +64,7 @@ public class PatientPersonFragment extends androidx.fragment.app.Fragment {
             FirestorePatientService.updateData(getActivity().getIntent().getStringExtra("user_uid"), patientDto);
             Toast.makeText(this.getContext(), "Patientendaten wurden gespeichert", Toast.LENGTH_LONG).show();
         } catch(ValidationException exc ) {
-            Toast.makeText(this.getContext(), "PatientData: Failure "+exc.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getContext(), exc.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
