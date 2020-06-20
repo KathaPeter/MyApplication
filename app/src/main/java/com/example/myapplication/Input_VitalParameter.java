@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,7 +35,7 @@ public class Input_VitalParameter extends Fragment {
     private ArrayList<Helper.ParseInfo> parseInfos;
     private Drawable errorBackgground = null;
     private Drawable inputBackgground = null;
-    private Trend trends = null;
+    private WelcomeActivity welcomeActivity = null;
 
 
     @Override
@@ -73,7 +74,17 @@ public class Input_VitalParameter extends Fragment {
         });
 
         emptyVitalParams();
+        testDisableInputs();
         return root;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof WelcomeActivity) {
+            welcomeActivity = (WelcomeActivity) context;
+        }
     }
 
     private void emptyVitalParams() {
@@ -142,8 +153,8 @@ public class Input_VitalParameter extends Fragment {
                             sendLimitContactPerson(listOutOfLimits);
                         }
                         //inform Trends
-                        if ( trends != null ) {
-                            trends.refresh();
+                        if (welcomeActivity != null) {
+                            welcomeActivity.onDataSendToServer();
                         }
                     }, //
                     (Integer status) -> Toast.makeText(getActivity(), "Send returned " + status, Toast.LENGTH_LONG).show(),
@@ -204,9 +215,21 @@ public class Input_VitalParameter extends Fragment {
         }
     }
 
+    public void testDisableInputs() {
+        String contactEmail = getActivity().getIntent().getStringExtra("contact_email");
+        boolean disableInput = (contactEmail == null || contactEmail.trim().length() == 0);
 
-    public void setListener(Trend trends) {
-        this.trends = trends;
+        root.findViewById(R.id.txtInfo).setVisibility(disableInput ? View.VISIBLE : View.GONE);
+
+        disable(R.id.blutdruck_diastolisch, disableInput);
+        disable(R.id.blutdruck_systolisch, disableInput);
+        disable(R.id.atemfrequenz, disableInput);
+        disable(R.id.puls, disableInput);
+        disable(R.id.gewicht, disableInput);
+    }
+
+    private void disable(int fieldId, boolean disableInput) {
+        root.findViewById(fieldId).setEnabled(!disableInput);
     }
 }
 

@@ -2,6 +2,7 @@ package com.example.myapplication.service;
 
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -23,7 +24,7 @@ public class HealthCareServerTrendService {
         Log.e("TrendService.class", url);
 
         // Request a response from the provided URL.
-        queue.add(new JsonArrayRequest( //
+        JsonArrayRequest myRequest = new JsonArrayRequest( //
                 Request.Method.GET, //
                 url, //
                 data, //
@@ -45,7 +46,14 @@ public class HealthCareServerTrendService {
                 }
                 return super.parseNetworkResponse(response);
             }
-        });
+        };
+
+        myRequest.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        queue.add(myRequest);
     }
 
     public static void request(RequestQueue queue, String url, JSONObject data, Response.Listener<JSONObject> onStatusOK, Response.Listener<Integer> onStatusNotOk, Response.ErrorListener onError) {
@@ -56,7 +64,7 @@ public class HealthCareServerTrendService {
         Log.e("TrendService.class", url);
 
         // Request a response from the provided URL.
-        queue.add(new JsonObjectRequest( //
+        JsonObjectRequest myRequest = new JsonObjectRequest( //
                 Request.Method.POST, //
                 url, //
                 data, //
@@ -78,6 +86,13 @@ public class HealthCareServerTrendService {
                 }
                 return super.parseNetworkResponse(response);
             }
-        });
+        };
+
+        myRequest.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        queue.add(myRequest);
     }
 }

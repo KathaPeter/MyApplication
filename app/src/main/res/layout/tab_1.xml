@@ -23,6 +23,16 @@
                 android:orientation="vertical"
                 android:showDividers="middle">
 
+                <TextView
+                    android:id="@+id/txtInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10px"
+                    android:layout_marginRight="10px"
+                    android:background="@drawable/background_error"
+                    android:text="Bitte zuerst Formular \n im Reiter Kontaktperson ausfüllen!"
+                    android:textAlignment="center" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -262,6 +272,7 @@
                         android:height="80dp"
                         android:text="Leeren" />
                 </LinearLayout>
+
             </LinearLayout>
         </ScrollView>
 

@@ -50,16 +50,14 @@ public class WelcomeActivity extends AppCompatActivity {
 
             switch (i) {
                 default:
+
                 case 0:
                     input = new Input_VitalParameter();
-                    input.setListener(trends);
                     fragment = input;
                     break;
 
                 case 1:
                     trends = new Trend();
-                    if (input != null)
-                        input.setListener(trends);
                     fragment = trends;
                     break;
 
@@ -103,6 +101,7 @@ public class WelcomeActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
+
         Button btLogout = findViewById(R.id.btLogout);
         btLogout.setOnClickListener((View v) -> {
             setResult(0, new Intent());
@@ -113,6 +112,8 @@ public class WelcomeActivity extends AppCompatActivity {
         tabs.getTabAt(1).setIcon(R.mipmap.ic_trend);
         tabs.getTabAt(2).setIcon(R.mipmap.ic_kontakt);
         tabs.getTabAt(3).setIcon(R.mipmap.ic_user);
+
+        tabs.invalidate();
     }
 
     void setWelcomeAlert() {
@@ -161,18 +162,30 @@ public class WelcomeActivity extends AppCompatActivity {
 
                     }
                 },  //
-                new Response.Listener<Integer>() {
-                    @Override
-                    public void onResponse(Integer status) {
+               (Integer status) -> {
                         Toast.makeText(WelcomeActivity.this, "Load Limit-Values Status " + status, Toast.LENGTH_LONG).show();
-                    }
                 }, //
                 (VolleyError error) -> {
+                    error.fillInStackTrace().printStackTrace();
+                    error.printStackTrace();
                     String text = error.getMessage();
-                    Log.e("DEBUG", text == null ? "" : text);
+                    Log.e(WelcomeActivity.class.getSimpleName()+".class", text == null ? "<?>" : text);
                     Toast.makeText(this, "Server unreachable: Could not load Limit-Values", Toast.LENGTH_LONG).show();
                 });
     }
 
+
+    public void onContactEmailChanged() {
+        if (input != null) {
+            input.testDisableInputs();
+        }
+    }
+
+
+    public void onDataSendToServer() {
+        if (trends != null) {
+            trends.refresh();
+        }
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.example.myapplication.activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.example.myapplication.Globals;
 import com.example.myapplication.Helper;
 import com.example.myapplication.R;
 import com.example.myapplication.ValidationException;
+import com.example.myapplication.WelcomeActivity;
 import com.example.myapplication.data.KontaktDto;
 import com.example.myapplication.service.FirestoreKontaktService;
 import com.google.android.gms.tasks.Task;
@@ -27,6 +29,7 @@ public class ContactPersonFragment extends Fragment {
 
     private View root;
     private RequestQueue requestQueue;
+    private WelcomeActivity welcomeActivity = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,13 +65,25 @@ public class ContactPersonFragment extends Fragment {
         loadContactPerson();
     }
 
+    //sets Activity (Context)
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof WelcomeActivity) {
+            this.welcomeActivity = (WelcomeActivity) context;
+        }
+    }
+
     private void updateContactPerson() {
         try {
             KontaktDto kontakt = extractFromForm();
             getActivity().getIntent().putExtra("contact_email", kontakt.getEmail());
+            if (welcomeActivity != null)
+                welcomeActivity.onContactEmailChanged();
             FirestoreKontaktService.updateKontakt(getActivity().getIntent().getStringExtra("user_uid"), kontakt);
             Toast.makeText(this.getContext(), "Kontaktdaten wurden gespeichert", Toast.LENGTH_LONG).show();
-        } catch(ValidationException exc ) {
+        } catch (ValidationException exc) {
             Toast.makeText(this.getContext(), exc.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
@@ -93,10 +108,12 @@ public class ContactPersonFragment extends Fragment {
         getContactTask.addOnSuccessListener(result -> {
             KontaktDto kontaktDto = result.toObject(KontaktDto.class);
             //Toast.makeText(this.getContext(), "Kontaktdaten wurden geladen", Toast.LENGTH_LONG).show();
-            if(kontaktDto!= null) {
+            if (kontaktDto != null) {
                 reloadForm(kontaktDto);
-            }});
+            }
+        });
     }
+
     private void reloadForm(KontaktDto kontaktDto) {
         EditText vornameInput = (EditText) root.findViewById(R.id.input_firstname);
         EditText nachnameInput = (EditText) root.findViewById(R.id.input_lastname);

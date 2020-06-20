@@ -95,14 +95,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
 
             login_success(currentUser.getUid(), currentUser.getEmail(),  2);
-
-
-
-
         } else {
             Log.d(MainActivity.class.toString(), "onStart signInWithEmailAndPassword:failure");
         }
-
     }
 
     private void login_success(final String uid, final String email, final int requestCode) {
@@ -117,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("user_email", email);
                 intent.putExtra("patient_name", patientDto.name);
                 intent.putExtra("patient_vorname", patientDto.vorname);
-
 
                 startActivityForResult(intent, requestCode);
             }
