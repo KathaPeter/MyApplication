@@ -136,7 +136,7 @@ public class Input_VitalParameter extends Fragment {
         if (errors.isEmpty()) {
             try {
                 data.put("timeStamp", "0001-01-01T00:00:00");
-                data.put("benutzer", getActivity().getIntent().getExtras().getString("patient_vorname"));
+                data.put("benutzer", HealthCareServerTrendService._bucket(getActivity().getIntent().getExtras()));
                 data.put("praxis", "praxis"); //TODO
             } catch (JSONException exc) {
                 //should never HAPPEN

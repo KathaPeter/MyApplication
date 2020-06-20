@@ -1,5 +1,6 @@
 package com.example.myapplication.service;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -94,5 +95,9 @@ public class HealthCareServerTrendService {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         queue.add(myRequest);
+    }
+
+    public static String _bucket(Bundle extras) {
+        return extras.getString("patient_vorname") + "_" + extras.getString("patient_name");
     }
 }

@@ -10,10 +10,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.data.KontaktDto;
 import com.example.myapplication.data.PatientDto;
-import com.example.myapplication.service.FirestorePatientService;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.myapplication.service.FirestoreKontaktService;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_main);
+
     }
 
     @Override
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Willkommen zurück",
                     Toast.LENGTH_LONG).show();
 
-            login_success(currentUser.getUid(), currentUser.getEmail(),  2);
+            login_success(currentUser.getUid(), currentUser.getEmail(), 2);
         } else {
             Log.d(MainActivity.class.toString(), "onStart signInWithEmailAndPassword:failure");
         }
@@ -100,25 +100,33 @@ public class MainActivity extends AppCompatActivity {
 
     private void login_success(final String uid, final String email, final int requestCode) {
         Task<DocumentSnapshot> getPatientDataTask = getPatientData(uid);
-        getPatientDataTask.addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                PatientDto patientDto = documentSnapshot.toObject(PatientDto.class);
+        getPatientDataTask.addOnSuccessListener((DocumentSnapshot documentSnapshot) -> {
+            PatientDto patientDto = documentSnapshot.toObject(PatientDto.class);
 
-                Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
-                intent.putExtra("user_uid", uid);
-                intent.putExtra("user_email", email);
-                intent.putExtra("patient_name", patientDto.name);
-                intent.putExtra("patient_vorname", patientDto.vorname);
+            Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+            intent.putExtra("user_uid", uid);
+            intent.putExtra("user_email", email);
+            intent.putExtra("patient_name", patientDto.name);
+            intent.putExtra("patient_vorname", patientDto.vorname);
 
-                startActivityForResult(intent, requestCode);
-            }
+            loadContact(intent, requestCode);
+        }).addOnFailureListener((Exception exc) ->{
+            Log.w(WelcomeActivity.class.toString(), "getPatientDataTask:failure", exc);
+        });
+    }
 
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(WelcomeActivity.class.toString(), "getPatientDataTask:failure", e);
-            }
+    //loadContact before startActivity
+    private void loadContact(Intent intent, int requestCode) {
+        Task<DocumentSnapshot> getContactTask = FirestoreKontaktService.getContactData(intent.getStringExtra("user_uid"));
+        getContactTask.addOnSuccessListener(result -> {
+            KontaktDto kontaktDto = result.toObject(KontaktDto.class);
+
+            intent.putExtra("contact_email", kontaktDto == null ? "" : kontaktDto.getEmail());
+
+            startActivityForResult(intent, requestCode);
+        });
+        getContactTask.addOnFailureListener((Exception failure) -> {
+
         });
     }
 }

@@ -157,9 +157,9 @@ public class Trend extends Fragment {
 
          */
 
-        final String benutzer = getActivity().getIntent().getStringExtra("patient_vorname");
+        Bundle extras = getActivity().getIntent().getExtras();
 
-        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten/" + benutzer + "/" + numberOfDays;
+        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten/" + HealthCareServerTrendService._bucket(extras) + "/" + numberOfDays;
 
         HealthCareServerTrendService.request(//
                 requestQueue, //

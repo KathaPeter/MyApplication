@@ -86,15 +86,6 @@ public class WelcomeActivity extends AppCompatActivity {
         setWelcomeAlert();
         loadLimitValues();
 
-        Task<DocumentSnapshot> getContactTask = FirestoreKontaktService.getContactData(getIntent().getStringExtra("user_uid"));
-        getContactTask.addOnSuccessListener(result -> {
-            KontaktDto kontaktDto = result.toObject(KontaktDto.class);
-            if (kontaktDto != null) {
-                getIntent().putExtra("contact_email", kontaktDto.getEmail());
-            }
-        });
-
-
         setContentView(R.layout.activity_welcome__page);
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(pagerAdapter);
@@ -122,9 +113,8 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     void loadLimitValues() {
-        final String benutzer = getIntent().getStringExtra("patient_vorname");
 
-        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/Alarm/" + benutzer;
+        final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/Alarm/" + HealthCareServerTrendService._bucket(getIntent().getExtras());
 
         HealthCareServerTrendService.request(//
                 requestQueue, //
