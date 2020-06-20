@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "EMail and Password required!",
                     Toast.LENGTH_LONG).show();
         } else {
-
             Task<AuthResult> loginTask = mAuth.signInWithEmailAndPassword(userEMail, userPWD)   //
                     .addOnCompleteListener(this, (@NonNull Task<AuthResult> task) -> {
 
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             authenticationFailed(task.getException());
                         }
-
                     }) //
                     .addOnFailureListener((fExc) -> {
                         authenticationFailed(fExc);
