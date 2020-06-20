@@ -149,9 +149,12 @@ public class Input_VitalParameter extends Fragment {
                     (JSONObject response) -> {
                         Toast.makeText(getActivity(), "Erfolgreich gesendet", Toast.LENGTH_LONG).show();
                         FirestoreFormularService.updateFormularDate(getActivity().getIntent().getStringExtra("user_uid"));
+
+                        Log.d(Input_VitalParameter.class.getSimpleName()+".class", "OutOfLimits: Count "+listOutOfLimits.size());
                         if (listOutOfLimits.size() > 0) {
                             sendLimitContactPerson(listOutOfLimits);
                         }
+
                         //inform Trends
                         if (welcomeActivity != null) {
                             welcomeActivity.onDataSendToServer();
@@ -179,6 +182,8 @@ public class Input_VitalParameter extends Fragment {
         final String vorname = extras.getString("patient_vorname");
         final String nachname = extras.getString("patient_name");
         final String kontaktmail = extras.getString("contact_email");
+
+
 
         for (String type : listOutOfLimits) {
 

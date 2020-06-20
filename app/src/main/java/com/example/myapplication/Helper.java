@@ -5,8 +5,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,13 +41,14 @@ public class Helper {
         double dLimitMax = extras.getDouble(info.jsonAttrib + "MAX");
         double dLimitMin = extras.getDouble(info.jsonAttrib + "MIN");
 
-        if ( number < dLimitMin || number > dLimitMax ) {
+        if (number < dLimitMin || number > dLimitMax) {
+            Log.d(Input_VitalParameter.class.getSimpleName() + ".class", "Number:" + number + "  (" + dLimitMin + "/" + dLimitMax + ")  <"+text+">");
             listOutOfLimits.add(info.displayName);
         }
 
         try {
             data.put(info.jsonAttrib, number);
-        }catch(JSONException exc) {
+        } catch (JSONException exc) {
             //Sollte nie passieren!
             throw new ValidationException("Interner Fehler", field);
         }
