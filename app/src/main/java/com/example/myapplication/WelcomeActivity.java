@@ -25,6 +25,7 @@ import com.example.myapplication.service.HealthCareServerTrendService;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,7 +81,7 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
+        FirebaseMessaging.getInstance().subscribeToTopic("user_"+ this.getIntent().getStringExtra("user_uid"));
         requestQueue = Volley.newRequestQueue(this);
 
         setWelcomeAlert();
@@ -170,7 +171,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     error.printStackTrace();
                     String text = error.getMessage();
                     Log.e(WelcomeActivity.class.getSimpleName()+".class", text == null ? "<?>" : text);
-                    Toast.makeText(this, "Server unreachable: Could not load Limit-Values", Toast.LENGTH_LONG).show();
+             //       Toast.makeText(this, "Server unreachable: Could not load Limit-Values", Toast.LENGTH_LONG).show();
                 });
     }
 

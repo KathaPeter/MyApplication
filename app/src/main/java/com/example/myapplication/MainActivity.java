@@ -19,6 +19,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import static com.example.myapplication.service.FirestorePatientService.getPatientData;
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Login erfolgreich", Toast.LENGTH_LONG).show();
                             Log.d(MainActivity.class.toString(), "signInWithEmailAndPassword:success");
                             login_success(task.getResult().getUser().getUid(), userEMail, 2);
+
                         } else {
                             authenticationFailed(task.getException());
                         }
@@ -110,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("user_email", email);
                 intent.putExtra("patient_name", patientDto.name);
                 intent.putExtra("patient_vorname", patientDto.vorname);
-
                 startActivityForResult(intent, requestCode);
             }
 
