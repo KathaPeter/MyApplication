@@ -2,6 +2,7 @@ package com.example.myapplication.activities;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.myapplication.DialogYesNo;
 import com.example.myapplication.Globals;
 import com.example.myapplication.Helper;
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ValidationException;
 import com.example.myapplication.WelcomeActivity;
@@ -78,6 +80,7 @@ public class ContactPersonFragment extends Fragment {
     private void updateContactPerson() {
         try {
             KontaktDto kontakt = extractFromForm();
+            Log.d(ContactPersonFragment.class.getSimpleName() + ".class", "CurrentUserContactEMail is " + kontakt.getEmail());
             getActivity().getIntent().putExtra("contact_email", kontakt.getEmail());
             if (welcomeActivity != null)
                 welcomeActivity.onContactEmailChanged();

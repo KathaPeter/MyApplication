@@ -19,12 +19,8 @@ import com.android.volley.toolbox.Volley;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.example.myapplication.activities.ContactPersonFragment;
 import com.example.myapplication.activities.PatientPersonFragment;
-import com.example.myapplication.data.KontaktDto;
-import com.example.myapplication.service.FirestoreKontaktService;
 import com.example.myapplication.service.HealthCareServerTrendService;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
@@ -81,11 +77,13 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        FirebaseMessaging.getInstance().subscribeToTopic("user_"+ this.getIntent().getStringExtra("user_uid"));
+        FirebaseMessaging.getInstance().subscribeToTopic("user_" + this.getIntent().getStringExtra("user_uid"));
         requestQueue = Volley.newRequestQueue(this);
 
         setWelcomeAlert();
-        loadLimitValues();
+
+        Log.d("WelcomeActivity.class", "OnCreate -> requestAlarm()");
+        requestAlarm();
 
         setContentView(R.layout.activity_welcome__page);
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -113,9 +111,11 @@ public class WelcomeActivity extends AppCompatActivity {
         alert.show(getSupportFragmentManager(), "Welcome_Alert");
     }
 
-    void loadLimitValues() {
+    void requestAlarm() {
 
         final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/Alarm/" + HealthCareServerTrendService._bucket(getIntent().getExtras());
+
+        Log.d("WelcomeActivity.class", "requestAlarm()");
 
         HealthCareServerTrendService.request(//
                 requestQueue, //
@@ -144,24 +144,30 @@ public class WelcomeActivity extends AppCompatActivity {
 
                             WelcomeActivity.this.getIntent().putExtra(check + "MIN", min);
                             WelcomeActivity.this.getIntent().putExtra(check + "MAX", max);
-
+                            Log.d(WelcomeActivity.class.getSimpleName() + ".class", "Limit: check <" + check + "> (" + min + "/+" + max + ")");
                         }
+
 
                         if (trends != null) {
                             trends.loadLimitValues();
+
+                            Log.d("WelcomeActivity.class", "requestAlarm() : done -> trends.loadAndRefresh()");
+                            trends.loadAndRefresh();
+                        } else {
+                            Log.d("WelcomeActivity.class", "requestAlarm() : done -> trends is null");
                         }
 
                     }
                 },  //
-               (Integer status) -> {
-                        Toast.makeText(WelcomeActivity.this, "Load Limit-Values Status " + status, Toast.LENGTH_LONG).show();
+                (Integer status) -> {
+                    Log.d(WelcomeActivity.class.getSimpleName() + ".class", "Load Limit-Values Returned Status " + status);
+                    Toast.makeText(WelcomeActivity.this, "Load Limit-Values Status " + status, Toast.LENGTH_LONG).show();
                 }, //
                 (VolleyError error) -> {
-                    error.fillInStackTrace().printStackTrace();
                     error.printStackTrace();
                     String text = error.getMessage();
-                    Log.e(WelcomeActivity.class.getSimpleName()+".class", text == null ? "<?>" : text);
-             //       Toast.makeText(this, "Server unreachable: Could not load Limit-Values", Toast.LENGTH_LONG).show();
+                    Log.d(WelcomeActivity.class.getSimpleName() + ".class", "VolleyError: " + (text == null ? "null" : text));
+                    Toast.makeText(this, "Server unreachable: Could not load Limit-Values", Toast.LENGTH_LONG).show();
                 });
     }
 
@@ -175,7 +181,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     public void onDataSendToServer() {
         if (trends != null) {
-            trends.refresh();
+            Log.d("WelcomeActivity.class", "onDataSendToServerEvent -> trends.loadAndRefresh");
+            trends.loadAndRefresh();
         }
     }
 

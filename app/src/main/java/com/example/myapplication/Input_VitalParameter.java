@@ -129,6 +129,7 @@ public class Input_VitalParameter extends Fragment {
                 Helper.viewToJSONDecimal(root, data, info, extras, listOutOfLimits);
             } catch (ValidationException e) {
                 e.getField().setBackground(errorBackgground);
+                Log.d("Input_VitalParameter.class", "ValidationError " + e.getMessage());
                 errors.add(e);
             }
         }
@@ -148,9 +149,14 @@ public class Input_VitalParameter extends Fragment {
             HealthCareServerTrendService.request(requestQueue, url, data,
                     (JSONObject response) -> {
                         Toast.makeText(getActivity(), "Erfolgreich gesendet", Toast.LENGTH_LONG).show();
-                        FirestoreFormularService.updateFormularDate(getActivity().getIntent().getStringExtra("user_uid"));
+                        FirestoreFormularService.updateFormularDate(extras.getString("user_uid"));
 
-                        Log.d(Input_VitalParameter.class.getSimpleName()+".class", "OutOfLimits: Count "+listOutOfLimits.size());
+
+                        if ( extras.containsKey("atemfrequenzMIN") == false) {
+                            welcomeActivity.requestAlarm();
+                        }
+
+                        Log.d(Input_VitalParameter.class.getSimpleName() + ".class", "OutOfLimits: " + listOutOfLimits);
                         if (listOutOfLimits.size() > 0) {
                             sendLimitContactPerson(listOutOfLimits);
                         }
@@ -182,7 +188,6 @@ public class Input_VitalParameter extends Fragment {
         final String vorname = extras.getString("patient_vorname");
         final String nachname = extras.getString("patient_name");
         final String kontaktmail = extras.getString("contact_email");
-
 
 
         for (String type : listOutOfLimits) {
@@ -224,6 +229,7 @@ public class Input_VitalParameter extends Fragment {
         String contactEmail = getActivity().getIntent().getStringExtra("contact_email");
         boolean disableInput = (contactEmail == null || contactEmail.trim().length() == 0);
 
+        Log.d("Input_VitalParameter.class", "testDisable: " + disableInput + ",  contact_email is <" + contactEmail + ">");
         root.findViewById(R.id.txtInfo).setVisibility(disableInput ? View.VISIBLE : View.GONE);
 
         disable(R.id.blutdruck_diastolisch, disableInput);

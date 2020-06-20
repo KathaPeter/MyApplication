@@ -13,6 +13,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HealthCareServerTrendService {
@@ -22,7 +23,7 @@ public class HealthCareServerTrendService {
         final StatusCode mStatusCode = new StatusCode();
 
 
-        Log.e("TrendService.class", url);
+        Log.d("TrendService.class", url);
 
         // Request a response from the provided URL.
         JsonArrayRequest myRequest = new JsonArrayRequest( //
@@ -62,7 +63,12 @@ public class HealthCareServerTrendService {
         final StatusCode mStatusCode = new StatusCode();
 
 
-        Log.e("TrendService.class", url);
+        Log.d("TrendService.class", url);
+        try {
+            Log.d("TrendService.class", data.toString(3));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         // Request a response from the provided URL.
         JsonObjectRequest myRequest = new JsonObjectRequest( //

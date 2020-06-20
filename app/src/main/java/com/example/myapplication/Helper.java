@@ -20,7 +20,6 @@ public class Helper {
         //trim
         String text = field.getText().toString().trim();
         if (text.length() == 0) {
-            Log.i("DEBUG", "Empty field");
             throw new ValidationException("Leeres Feld vorhanden.", field);
         }
 
@@ -41,9 +40,13 @@ public class Helper {
         double dLimitMax = extras.getDouble(info.jsonAttrib + "MAX");
         double dLimitMin = extras.getDouble(info.jsonAttrib + "MIN");
 
-        if (number < dLimitMin || number > dLimitMax) {
-            Log.d(Input_VitalParameter.class.getSimpleName() + ".class", "Number:" + number + "  (" + dLimitMin + "/" + dLimitMax + ")  <"+text+">");
-            listOutOfLimits.add(info.displayName);
+        if (dLimitMin == 0.0 && dLimitMax == 0.0) {
+            Log.e(Input_VitalParameter.class.getSimpleName() + ".class", "LimitValues unavaiable!! Type:" + info.jsonAttrib );
+        } else {
+            if (number < dLimitMin || number > dLimitMax) {
+                Log.d(Input_VitalParameter.class.getSimpleName() + ".class", "Number:" + number + "  (" + dLimitMin + "/" + dLimitMax + ")  <" + text + ">");
+                listOutOfLimits.add(info.displayName);
+            }
         }
 
         try {

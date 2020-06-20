@@ -21,7 +21,7 @@ public class CloudMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        Log.d("msg", "onMessageReceived: " + remoteMessage.getData().get("message"));
+        Log.d("CloudMessagingService.class", "onMessageReceived: " + remoteMessage.getData().get("message"));
         Intent intent = new Intent(this, Input_VitalParameter.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -44,7 +44,7 @@ public class CloudMessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
-        Log.d("registerNewToken", "Refreshed token: " + s);
+        Log.d("CloudMessagingService.class", "Refreshed token: " + s);
     }
 
 }

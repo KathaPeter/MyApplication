@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if (task.isSuccessful()) {
                             Toast.makeText(getApplicationContext(), "Login erfolgreich", Toast.LENGTH_LONG).show();
-                            Log.d(MainActivity.class.toString(), "signInWithEmailAndPassword:success");
+                            Log.d(MainActivity.class.getSimpleName() + ".class", "signInWithEmailAndPassword:success");
                             login_success(task.getResult().getUser().getUid(), userEMail, 2);
                         } else {
                             authenticationFailed(task.getException());
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void authenticationFailed(Exception exc) {
-        Log.w(MainActivity.class.toString(), "signInWithEmailAndPassword:failure", exc);
+        Log.e(MainActivity.class.getSimpleName() + ".class", "signInWithEmailAndPassword:failure", exc);
         Toast.makeText(getApplicationContext(), "No authentication possible. Please proove your login details.",
                 Toast.LENGTH_LONG).show();
     }
@@ -85,20 +85,21 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        Log.d(MainActivity.class.toString(), "OnStart: CurrentUser is" + currentUser);
+
 
         if (currentUser != null) {
-            Log.d(MainActivity.class.toString(), "onStart getCurrentUser:success");
-            Toast.makeText(getApplicationContext(), "Willkommen zurück",
-                    Toast.LENGTH_LONG).show();
+            Log.d(MainActivity.class.getSimpleName() + ".class", "onStart getCurrentUser:success");
+            Toast.makeText(getApplicationContext(), "Willkommen zurück", Toast.LENGTH_LONG).show();
 
             login_success(currentUser.getUid(), currentUser.getEmail(), 2);
         } else {
-            Log.d(MainActivity.class.toString(), "onStart signInWithEmailAndPassword:failure");
+            Log.d(MainActivity.class.getSimpleName()+".class", "onStart signInWithEmailAndPassword:failure");
         }
     }
 
     private void login_success(final String uid, final String email, final int requestCode) {
+
+
         Task<DocumentSnapshot> getPatientDataTask = getPatientData(uid);
         getPatientDataTask.addOnSuccessListener((DocumentSnapshot documentSnapshot) -> {
             PatientDto patientDto = documentSnapshot.toObject(PatientDto.class);
@@ -109,9 +110,14 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("patient_name", patientDto.name);
             intent.putExtra("patient_vorname", patientDto.vorname);
 
+            Log.d(MainActivity.class.getSimpleName() + ".class", "CurrentUserID is " + uid);
+            Log.d(MainActivity.class.getSimpleName() + ".class", "CurrentUserEMail is " + email);
+            Log.d(MainActivity.class.getSimpleName() + ".class", "CurrentUserFirstName is " + patientDto.vorname);
+            Log.d(MainActivity.class.getSimpleName() + ".class", "CurrentUserLastName is " + patientDto.name);
+
             loadContact(intent, requestCode);
-        }).addOnFailureListener((Exception exc) ->{
-            Log.w(WelcomeActivity.class.toString(), "getPatientDataTask:failure", exc);
+        }).addOnFailureListener((Exception exc) -> {
+            Log.w(WelcomeActivity.class.getSimpleName()+".class", "getPatientDataTask:failure", exc);
         });
     }
 
@@ -121,6 +127,10 @@ public class MainActivity extends AppCompatActivity {
         getContactTask.addOnSuccessListener(result -> {
             KontaktDto kontaktDto = result.toObject(KontaktDto.class);
 
+            Log.d(MainActivity.class.getSimpleName() + ".class", "CurrentUserContact is " + kontaktDto);
+            if ( kontaktDto != null) {
+                Log.d(MainActivity.class.getSimpleName() + ".class", "CurrentUserContactEMail is " + kontaktDto.getEmail());
+            }
             intent.putExtra("contact_email", kontaktDto == null ? "" : kontaktDto.getEmail());
 
             startActivityForResult(intent, requestCode);

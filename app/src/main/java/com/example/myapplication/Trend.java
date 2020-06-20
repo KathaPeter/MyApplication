@@ -65,6 +65,7 @@ public class Trend extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.tab_2, container, false);
 
+
         //dGewicht, dPuls, dBlutSys, dBlutDias, dAtemFreq
         spinnerItems = new ArrayList<>();
         spinnerItems.add(new SpinnerItem("Gewicht", "{ x: 'x', value: 'value' }", "gewicht"));
@@ -78,7 +79,9 @@ public class Trend extends Fragment {
         ArrayAdapter<SpinnerItem> arrayAdapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), android.R.layout.simple_spinner_item, spinnerItems);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
-        spinner.setSelection(0);
+
+        Log.d("Trend.class", "OnCreateView " + spinner.getSelectedItem());
+
 
         initAnyChart();
 
@@ -87,12 +90,13 @@ public class Trend extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
-                showData(item);
+                Log.d("Trend.class", "SpinnerChangedEvent -> refreshWithoutLoad()");
+                refreshWithoutLoad();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                Log.d("Trend.class", "SpinnerNothingSelectedEvent");
             }
         });
 
@@ -110,7 +114,8 @@ public class Trend extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                loadVitalValues(seekBar.getProgress() * 5);
+                Log.d("Trend.class", "SeekbarChangedEvent -> loadAndRefresh()");
+                loadAndRefresh();
             }
         });
 
@@ -120,7 +125,10 @@ public class Trend extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        refresh();
+        Log.d("Trend.class", "OnStart -> loadAndRefresh()");
+        Spinner spinner = root.findViewById(R.id.ddSeries);
+        spinner.setSelection(0);
+        loadAndRefresh();
     }
 
     public void loadLimitValues() {
@@ -134,8 +142,6 @@ public class Trend extends Fragment {
             item.storeRangeValue(min, max);
         }
 
-        Spinner spinner = root.findViewById(R.id.ddSeries);
-        showData((Trend.SpinnerItem) spinner.getSelectedItem());
     }
 
     private void loadVitalValues(int numberOfDays) {
@@ -157,6 +163,12 @@ public class Trend extends Fragment {
 
          */
 
+        if (numberOfDays <= 0) {
+            numberOfDays = 1;
+        }
+
+        Log.d("Trend.class", "loadVitalValues(" + numberOfDays + ")");
+
         Bundle extras = getActivity().getIntent().getExtras();
 
         final String url = "http://" + Globals.hostHealthCare + ":" + Globals.portHealthCare + "/api/GesundheitsDaten/" + HealthCareServerTrendService._bucket(extras) + "/" + numberOfDays;
@@ -173,24 +185,24 @@ public class Trend extends Fragment {
                     for (int i = 0; i < n; i++) {
                         AnyChartDataEntry entry = AnyChartDataEntry.createFrom(_safeGet(response, i), i);
                         if (entry != null) {
-                            Log.e(Trend.class.getSimpleName() + ".class", "entry " + i + " is " + entry.date.getTime());
+                            Log.d(Trend.class.getSimpleName() + ".class", "entry[" + i + "] is " + entry.date.getTime());
                             list.add(entry);
                         } else {
-                            Log.e(Trend.class.getSimpleName() + ".class", "entry " + i + " is null");
+                            Log.d(Trend.class.getSimpleName() + ".class", "entry[" + i + "] is null");
                         }
                     }
 
                     Trend.this.list = list;
                     //Toast.makeText(getActivity(), "server: " + n + " chart: " + list.size(), Toast.LENGTH_LONG).show();
 
-                    Spinner spinner = root.findViewById(R.id.ddSeries);
-                    showData((SpinnerItem) spinner.getSelectedItem());
+                    Log.d("Trend.class", "VitalValuesLoaded: " + list.size() + " -> refreshWithoutLoad()");
+                    refreshWithoutLoad();
 
                 },  //
                 (Integer status) -> Toast.makeText(getActivity(), "Load Vital-Values Status " + status, Toast.LENGTH_LONG).show(), //
                 (VolleyError error) -> {
                     String text = error.getMessage();
-                    Log.e("DEBUG", text == null ? "" : text);
+                    Log.d("Trend.class", "VolleyError: " + (text == null ? "null" : text));
                     Toast.makeText(getActivity(), "Server unreachable: Could not load Vital-Values", Toast.LENGTH_LONG).show();
                 });
     }
@@ -271,25 +283,31 @@ public class Trend extends Fragment {
     private void showData(SpinnerItem item) {
 
         if (list != null) {
+            List<DataEntry> ref = list;
 
-            if (list.size() > 0) {
+            Log.d("Trend.class", "showData( " + (item == null ? "null" : item.display) + " )");
+
+            if (ref.size() > 0) {
                 boolean allSame = true;
-                String compareTo = list.get(0).getValue("x") + "";
-                for (DataEntry entry : list) {
+                String compareTo = ref.get(0).getValue("x") + "";
+                for (DataEntry entry : ref) {
                     if (compareTo.compareTo(entry.getValue("x") + "") != 0) {
                         allSame = false;
                         break;
                     }
                 }
                 if (allSame) {
-                    list.add(0, new AnyChartDataEntry((AnyChartDataEntry) list.get(list.size() - 1)));
+                    ref.add(0, new AnyChartDataEntry((AnyChartDataEntry) ref.get(ref.size() - 1)));
                 }
             }
 
             //set Data
-            set.data(list);
+            set.data(ref);
+
+            loadLimitValues();
 
             for (SpinnerItem i : spinnerItems) {
+
                 i.getLine().enabled(false);
                 i.getLegendItem().disabled();
                 i.getLegendItem().iconEnabled(false);
@@ -305,10 +323,10 @@ public class Trend extends Fragment {
                 item.getLegendItem().text(item.toString());
                 item.getRange().enabled(true);
                 item.initRange();
-            } //else {
-            // Toast.makeText(getContext(), "SpinnerItem is NULL", Toast.LENGTH_LONG).show();
-            //}
+            }
 
+        } else {
+            Log.d("Trend.class", "showData( " + (item == null ? "null" : item.display) + " ) LIST is NULL");
         }
     }
 
@@ -316,18 +334,29 @@ public class Trend extends Fragment {
         try {
             return (JSONObject) response.get(i);
         } catch (Exception e) {
-            Log.e(Trend.class.getSimpleName() + ".class", "ParseError: " + e.getMessage());
+            Log.d(Trend.class.getSimpleName() + ".class", "JSONArray.get(" + i + ") Error: " + e.getMessage());
             return null;
         }
     }
 
-    public void refresh() {
+    public void loadAndRefresh() {
+
+        Log.d("Trend.class", "loadAndRefresh() -> loadVitalValues(?)");
+
         int days = 5;
-        if ( root != null ) {
+        if (root != null) {
             SeekBar bar = root.findViewById(R.id.barDays);
             days = bar.getProgress() * 5;
         }
         loadVitalValues(days);
+    }
+
+    public void refreshWithoutLoad() {
+        Log.d("Trend.class", "refreshWithoutLoad() -> showData(?)");
+
+        Spinner spinner = root.findViewById(R.id.ddSeries);
+        showData((SpinnerItem) spinner.getSelectedItem());
+
     }
 
 
