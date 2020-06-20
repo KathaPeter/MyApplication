@@ -57,6 +57,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/background_input"
+                    android:backgroundTint="#3ED8CDCD"
                     android:editable="false"
                     android:ems="10"
                     android:paddingLeft="10dp"
@@ -86,6 +87,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/background_input"
+                    android:backgroundTint="#3ED8CDCD"
                     android:editable="false"
                     android:ems="10"
                     android:paddingLeft="10dp"
@@ -147,7 +149,7 @@
                     android:paddingLeft="10dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp"/>
+                    android:paddingBottom="5dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -174,7 +176,7 @@
                     android:paddingLeft="10dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp"/>
+                    android:paddingBottom="5dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -201,7 +203,7 @@
                     android:paddingLeft="10dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp"/>
+                    android:paddingBottom="5dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -251,6 +253,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/background_input"
+                    android:backgroundTint="#3ED8CDCD"
                     android:editable="false"
                     android:ems="10"
                     android:paddingLeft="10dp"
@@ -267,8 +270,8 @@
                 android:orientation="horizontal">
 
                 <Button
-                    style="?android:attr/buttonBarButtonStyle"
                     android:id="@+id/bt_save"
+                    style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -276,8 +279,8 @@
                     android:text="Speichern" />
 
                 <Button
-                    style="?android:attr/buttonBarButtonStyle"
                     android:id="@+id/bt_cancel"
+                    style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
